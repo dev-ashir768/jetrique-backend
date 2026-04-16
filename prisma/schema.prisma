@@ -6,3 +6,106 @@ generator client {
 datasource db {
   provider = "mysql"
 }
+
+enum TenantStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+// ─────────────────────────────
+// ROLE
+// ─────────────────────────────
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+  isActive    Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  users           User[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+}
+
+// ─────────────────────────────
+// PERMISSION
+// ─────────────────────────────
+model Permission {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+
+  rolePermission RolePermission[]
+
+  createdAt DateTime @default(now())
+
+  @@map("permissions")
+}
+
+// ─────────────────────────────
+// ROLE PERMISSIONS
+// ─────────────────────────────
+model RolePermission {
+  id     Int  @id @default(autoincrement())
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [id])
+
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId Int
+
+  createdAt DateTime @default(now())
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// ─────────────────────────────
+// TENANT
+// ─────────────────────────────
+model Tenant {
+  id     Int          @id @default(autoincrement())
+  name   String
+  email  String       @unique
+  status TenantStatus @default(ACTIVE)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  users User[]
+
+  @@map("tenants")
+}
+
+// ============================================
+// USER
+// ============================================
+
+model User {
+  id             Int     @id @default(autoincrement())
+  fullName       String
+  email          String  @unique
+  password       String
+  phone          String?
+  isActive       Boolean @default(true)
+  commissionRate Float   @default(0)
+
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [id])
+
+  tenantId Int?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("users")
+}
