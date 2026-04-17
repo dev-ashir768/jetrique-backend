@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient } from "../../generated/prisma/client";
 
 if (!process.env.DATABASE_HOST) throw new Error("DATABASE_HOST missing");
 if (!process.env.DATABASE_USER) throw new Error("DATABASE_USER missing");
@@ -17,6 +17,9 @@ const adapter = new PrismaMariaDb({
   connectionLimit: 5,
 });
 
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient({
+  adapter,
+  log: ["query", "info", "warn", "error"],
+});
 
 export { prisma };

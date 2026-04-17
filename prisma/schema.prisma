@@ -1,12 +1,15 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "mysql"
 }
 
+// ─────────────────────────────
+// ENUMS
+// ─────────────────────────────
 enum TenantStatus {
   ACTIVE
   INACTIVE
@@ -18,18 +21,24 @@ enum TenantStatus {
 // ─────────────────────────────
 model Role {
   id          Int     @id @default(autoincrement())
-  name        String  @unique
+  name        String
   slug        String  @unique
   description String?
-  isActive    Boolean @default(true)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+  createdBy Int?
+  updatedBy Int?
+  deletedBy Int?
 
-  users           User[]
-  rolePermissions RolePermission[]
+  tenantId Int?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id])
 
+  permissions Permission[]
+  users       User[]
+
+  @@unique([tenantId, slug])
   @@map("roles")
 }
 
@@ -38,74 +47,74 @@ model Role {
 // ─────────────────────────────
 model Permission {
   id          Int     @id @default(autoincrement())
-  name        String  @unique
-  slug        String  @unique
+  name        String
+  slug        String
   description String?
 
-  rolePermission RolePermission[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy Int?
+  updatedBy Int?
+  deletedBy Int?
 
-  createdAt DateTime @default(now())
+  isActive   Boolean @default(true)
+  isApproved Boolean @default(false)
 
-  @@map("permissions")
-}
-
-// ─────────────────────────────
-// ROLE PERMISSIONS
-// ─────────────────────────────
-model RolePermission {
-  id     Int  @id @default(autoincrement())
   roleId Int
   role   Role @relation(fields: [roleId], references: [id])
 
-  permission   Permission @relation(fields: [permissionId], references: [id])
-  permissionId Int
-
-  createdAt DateTime @default(now())
-
-  @@unique([roleId, permissionId])
-  @@map("role_permissions")
+  @@unique([roleId, slug])
+  @@map("permissions")
 }
 
 // ─────────────────────────────
 // TENANT
 // ─────────────────────────────
 model Tenant {
-  id     Int          @id @default(autoincrement())
-  name   String
-  email  String       @unique
-  status TenantStatus @default(ACTIVE)
+  id      Int          @id @default(autoincrement())
+  name    String
+  email   String       @unique
+  slug    String       @unique
+  phone   String?
+  status  TenantStatus @default(ACTIVE)
+  logo    String?
+  address String?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+  createdBy Int?
+  updatedBy Int?
+  deletedBy Int?
 
   users User[]
+  roles Role[]
 
   @@map("tenants")
 }
 
-// ============================================
+// ─────────────────────────────
 // USER
-// ============================================
-
+// ─────────────────────────────
 model User {
-  id             Int     @id @default(autoincrement())
-  fullName       String
-  email          String  @unique
-  password       String
-  phone          String?
-  isActive       Boolean @default(true)
-  commissionRate Float   @default(0)
-
-  roleId Int
-  role   Role @relation(fields: [roleId], references: [id])
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  phone     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy Int?
+  updatedBy Int?
+  deletedBy Int?
 
   tenantId Int?
   tenant   Tenant? @relation(fields: [tenantId], references: [id])
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [id])
 
   @@map("users")
 }
