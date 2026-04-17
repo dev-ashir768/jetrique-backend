@@ -50,6 +50,7 @@ model Permission {
   name        String
   slug        String
   description String?
+  icon        String? @default("House")
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -72,14 +73,14 @@ model Permission {
 // TENANT
 // ─────────────────────────────
 model Tenant {
-  id      Int          @id @default(autoincrement())
-  name    String
-  email   String       @unique
-  slug    String       @unique
-  phone   String?
-  status  TenantStatus @default(ACTIVE)
-  logo    String?
-  address String?
+  id       Int          @id @default(autoincrement())
+  fullName String
+  email    String       @unique
+  slug     String       @unique
+  phone    String?
+  status   TenantStatus @default(ACTIVE)
+  logo     String?
+  address  String?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -99,7 +100,7 @@ model Tenant {
 // ─────────────────────────────
 model User {
   id        Int       @id @default(autoincrement())
-  name      String
+  fullName  String
   email     String    @unique
   password  String
   phone     String?
