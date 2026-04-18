@@ -16,6 +16,11 @@ enum TenantStatus {
   SUSPENDED
 }
 
+enum TenantType {
+  OPERATOR
+  PARTNER
+}
+
 // ─────────────────────────────
 // ROLE
 // ─────────────────────────────
@@ -79,6 +84,7 @@ model Tenant {
   slug     String       @unique
   phone    String?
   status   TenantStatus @default(ACTIVE)
+  type     TenantType   @default(PARTNER)
   logo     String?
   address  String?
 
