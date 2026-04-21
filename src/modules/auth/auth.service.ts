@@ -87,7 +87,7 @@ export const authService = {
       throw new Error("Your account is inactive. Contact support");
 
     // Generate tokens
-    const tokenPayload: JWTAccessTokenType = {
+    const accesssTokenPayload: JWTAccessTokenType = {
       userId: user.id,
       roleId: user.role.id,
       roleSlug: user.role.slug,
@@ -96,7 +96,7 @@ export const authService = {
       userId: user.id,
     };
 
-    const accessToken = generateAccessToken(tokenPayload);
+    const accessToken = generateAccessToken(accesssTokenPayload);
     const refreshToken = generateRefreshToken(refreshTokenPayload);
 
     // Save refresh token
@@ -128,10 +128,10 @@ export const authService = {
 
   refreshAccessToken: async (payload: RefreshAccessTokenFormType) => {
     const { refreshToken } = payload;
-    let decoded: { userId: number };
+    let decoded: JWTRefreshTokenType;
 
     try {
-      decoded = verifyRefreshToken(refreshToken) as { userId: number };
+      decoded = verifyRefreshToken(refreshToken) as JWTRefreshTokenType;
     } catch (error) {
       throw new Error("Invalid refresh token");
     }
@@ -150,12 +150,12 @@ export const authService = {
     if (!storedToken.user.isActive) throw new Error("Account is inactive");
 
     // Generate new access token
-    const tokenPayload: JWTAccessTokenType = {
+    const accesssTokenPayload: JWTAccessTokenType = {
       userId: decoded.userId,
       roleId: storedToken.user.role.id,
       roleSlug: storedToken.user.role.slug,
     };
-    const newAccessToken = generateAccessToken(tokenPayload);
+    const newAccessToken = generateAccessToken(accesssTokenPayload);
 
     return {
       accessToken: newAccessToken,

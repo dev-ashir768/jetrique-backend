@@ -14,8 +14,8 @@ export const authMiddleware = {
     const accessToken = authHeader.split(" ")[1];
 
     try {
-      const decoded = verifyAccessToken(accessToken);
-      req.user = decoded as JWTAccessTokenType;
+      const decoded = verifyAccessToken(accessToken) as JWTAccessTokenType;
+      req.user = decoded;
       next();
     } catch (error) {
       return sendError(res, "Invalid or expired access token", 401);

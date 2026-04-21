@@ -25,11 +25,11 @@ export const userService = {
     });
   },
 
-  saveRefreshToken: async (userId: number, token: string) => {
+  saveRefreshToken: async (userId: number, refreshToken: string) => {
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
     await prisma.refreshToken.create({
       data: {
-        token,
+        token: refreshToken,
         userId,
         expiresAt,
       },
