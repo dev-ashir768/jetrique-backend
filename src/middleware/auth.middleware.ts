@@ -7,7 +7,7 @@ export const authMiddleware = {
   verifyAccessToken: (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || authHeader.startsWith("Bearer ")) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return sendError(res, "Access token not found", 401);
     }
 
