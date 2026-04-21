@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { authService } from "./auth.service";
 import { sendError, sendSuccess } from "@/utils/response.util";
 
-export const AuthController = {
+export const authController = {
   registerAgent: asyncHandler(async (req: Request, res: Response) => {
     const data = await authService.registerAgent(req.body);
     sendSuccess(

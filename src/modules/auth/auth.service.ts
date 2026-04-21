@@ -67,6 +67,7 @@ export const authService = {
 
   login: async (payload: LoginFormType) => {
     const { email, password } = payload;
+    console.log("hello", email, password)
 
     // Find user
     const user = await userService.getUserByEmail(email);
