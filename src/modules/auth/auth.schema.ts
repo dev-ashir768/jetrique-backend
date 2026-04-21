@@ -1,6 +1,5 @@
-import { REGEX } from "@/utils/constants";
 import z from "zod";
-import { AgentType } from "generated/prisma";
+import { REGEX } from "@/utils/constants.util";
 
 // ─── Register ───
 export const registerSchema = z.object({
@@ -37,12 +36,7 @@ export const registerSchema = z.object({
         error: "Invalid input: Code-like content is not allowed",
       })
       .optional(),
-    agentType: z.enum(AgentType, {
-      error: (issue) =>
-        issue.input === ""
-          ? "Agent type is required"
-          : `Agent Type must be ${Object.values(AgentType).join(", ")}`,
-    }),
+    roleId: z.number().min(1, "Role is required"),
     companyName: z.string().min(2, "Company name is required").optional(),
     cnic: z
       .string()
@@ -144,3 +138,30 @@ export const changePasswordSchema = z.object({
       }),
   }),
 });
+
+// ─── Refresh Access Token ───
+export const refreshAccessTokenSchema = z.object({
+  body: z.object({
+    refreshToken: z.string().min(1, "Refresh token is required"),
+  }),
+});
+
+// ─── Logout ───
+export const logoutSchema = z.object({
+  body: z.object({
+    refreshToken: z.string().min(1, "Refresh token is required"),
+  }),
+});
+
+// ─── Type Safety ───
+export type RegisterFormType = z.infer<typeof registerSchema>["body"];
+export type LoginFormType = z.infer<typeof loginSchema>["body"];
+export type ForgotPasswordFormType = z.infer<
+  typeof forgotPasswordSchema
+>["body"];
+export type ResetPasswordFormType = z.infer<typeof resetPasswordSchema>["body"];
+export type ChangePasswordFormType = z.infer<
+  typeof changePasswordSchema
+>["body"];
+export type RefreshAccessTokenFormType = z.infer<typeof refreshAccessTokenSchema>["body"];
+export type LogoutFormType = z.infer<typeof logoutSchema>["body"];

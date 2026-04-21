@@ -100,15 +100,31 @@ model RolePermission {
 }
 
 // ─────────────────────────────
+// REFRESH TOKEN
+// ─────────────────────────────
+model RefreshToken {
+  id    Int    @id @default(autoincrement())
+  token String @unique
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  isRevoked Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+// ─────────────────────────────
 // AGENT
 // ─────────────────────────────
 model Agent {
-  id          Int       @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   fullName    String
-  email       String    @unique
-  phone       String?
-  agentType   AgentType
+  email       String  @unique
   companyName String?
+  phone       String?
   cnic        String
 
   createdAt DateTime  @default(now())
@@ -118,7 +134,8 @@ model Agent {
   updatedBy Int?
   deletedBy Int?
 
-  isActive Boolean @default(true)
+  isActive Boolean       @default(true)
+  status   AccountStatus @default(PENDING)
 
   user User[]
 
@@ -154,8 +171,9 @@ model User {
   roleId Int
   role   Role @relation(fields: [roleId], references: [id])
 
-  agentId Int?
-  agent   Agent? @relation(fields: [agentId], references: [id])
+  agentId       Int?
+  agent         Agent?         @relation(fields: [agentId], references: [id])
+  refreshTokens RefreshToken[]
 
   @@map("users")
 }
