@@ -177,7 +177,7 @@ export const authService = {
       data: { isRevoked: true },
     });
 
-    return {};
+    return null;
   },
 
   changePassword: async (
@@ -208,6 +208,6 @@ export const authService = {
       data: { isRevoked: true },
     });
 
-    return {};
+    return null;
   },
 };
