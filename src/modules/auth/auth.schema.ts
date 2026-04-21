@@ -3,7 +3,12 @@ import { REGEX } from "@/utils/constants.util";
 
 // ─── Register ───
 export const registerSchema = z.object({
-  fullName: z.string().min(3, "Full name must be at least 3 characters"),
+  fullName: z
+    .string({
+      error: (issue) =>
+        issue.input === "" ? "Full name is required" : "Invalid full name",
+    })
+    .min(3, "Full name must be at least 3 characters"),
   email: z
     .email({
       error: (issue) =>

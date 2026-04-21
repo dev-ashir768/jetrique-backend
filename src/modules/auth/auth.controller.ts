@@ -37,7 +37,7 @@ export const authController = {
     );
   }),
 
-  refresh: asyncHandler(async (req: Request, res: Response) => {
+  refreshAccessToken: asyncHandler(async (req: Request, res: Response) => {
     const data = await authService.refreshAccessToken(req.body);
     sendSuccess(res, data, "Access token refreshed successfully");
   }),
