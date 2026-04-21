@@ -149,6 +149,14 @@ export const authService = {
       throw new Error("Refresh token has expired");
     if (!storedToken.user.isActive) throw new Error("Account is inactive");
 
+    // Check user status
+    if (storedToken.user.status === "PENDING")
+      throw new Error("Your account is pending admin approval");
+    if (storedToken.user.status === "REJECTED")
+      throw new Error("Your account has been rejected. Contact support");
+    if (storedToken.user.status === "SUSPENDED")
+      throw new Error("Your account has been suspended. Contact support");
+
     // Generate new access token
     const accesssTokenPayload: JWTAccessTokenType = {
       userId: decoded.userId,
