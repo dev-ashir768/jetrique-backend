@@ -11,8 +11,6 @@ datasource db {
 // ENUMS
 // ─────────────────────────────
 enum AccountStatus {
-  ACTIVE
-  INACTIVE
   SUSPENDED
   REJECTED
   APPROVED
@@ -65,6 +63,10 @@ model Permission {
   slug        String
   description String?
   icon        String? @default("House")
+
+  parentId Int?
+  parent   Permission?  @relation("PermissionParent", fields: [parentId], references: [id])
+  children Permission[] @relation("PermissionParent")
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -134,18 +136,38 @@ model Agent {
   updatedBy Int?
   deletedBy Int?
 
+  approvedBy Int?
+  approvedAt DateTime?
+
   isActive Boolean       @default(true)
   status   AccountStatus @default(PENDING)
 
   user User[]
 
-  roleId    Int
-  role      Role    @relation(fields: [roleId], references: [id])
-  psaId     Int?
-  psa       Agent?  @relation("PSAtoSubAgent", fields: [psaId], references: [id])
-  subAgents Agent[] @relation("PSAtoSubAgent")
+  roleId          Int
+  role            Role             @relation(fields: [roleId], references: [id])
+  psaId           Int?
+  psa             Agent?           @relation("PSAtoSubAgent", fields: [psaId], references: [id])
+  subAgents       Agent[]          @relation("PSAtoSubAgent")
+  agentStatusLogs AgentStatusLog[]
 
   @@map("agents")
+}
+
+// ─────────────────────────────
+// AGENT STATUS LOG
+// ─────────────────────────────
+model AgentStatusLog {
+  id        Int           @id @default(autoincrement())
+  agentId   Int
+  agent     Agent         @relation(fields: [agentId], references: [id])
+  status    AccountStatus
+  changedBy Int?
+  reason    String?
+
+  createdAt DateTime @default(now())
+
+  @@map("agent_status_logs")
 }
 
 // ─────────────────────────────

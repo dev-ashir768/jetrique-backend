@@ -1,7 +1,8 @@
 import { validate } from "@/middleware/validate.middleware";
 import { authController } from "@/modules/auth/auth.controller";
 import { Router } from "express";
-import { loginSchema, registerSchema } from "./auth.schema";
+import { loginSchema, logoutSchema, registerSchema } from "./auth.schema";
+import { authMiddleware } from "@/middleware/auth.middleware";
 
 const router = Router();
 
@@ -11,6 +12,12 @@ router.post(
   "/register",
   validate(registerSchema),
   authController.registerAgent,
+);
+router.post(
+  "/logout",
+  authMiddleware.verifyAccessToken,
+  validate(logoutSchema),
+  authController.logout,
 );
 
 export default router;
