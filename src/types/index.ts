@@ -7,3 +7,9 @@ export interface JWTAccessTokenType {
 export interface JWTRefreshTokenType {
   userId: number;
 }
+
+export const enum ValidationSource {
+  BODY = "body",
+  PARAMS = "params",
+  QUERY = "query",
+}
