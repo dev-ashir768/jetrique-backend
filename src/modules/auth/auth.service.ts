@@ -14,6 +14,7 @@ import {
 } from "@/utils/jwt.util";
 import { userService } from "../user/user.service";
 import { roleService } from "../role/role.service";
+import { JWTAccessTokenType, JWTRefreshTokenType } from "@/types";
 
 export const authService = {
   registerAgent: async (payload: RegisterFormType) => {
@@ -86,13 +87,17 @@ export const authService = {
       throw new Error("Your account is inactive. Contact support");
 
     // Generate tokens
-    const accessToken = generateAccessToken(
-      user.id,
-      user.role.id,
-      user.role.slug,
-      user.agentId,
-    );
-    const refreshToken = generateRefreshToken(user.id);
+    const tokenPayload: JWTAccessTokenType = {
+      userId: user.id,
+      roleId: user.role.id,
+      roleSlug: user.role.slug,
+    };
+    const refreshTokenPayload: JWTRefreshTokenType = {
+      userId: user.id,
+    };
+
+    const accessToken = generateAccessToken(tokenPayload);
+    const refreshToken = generateRefreshToken(refreshTokenPayload);
 
     // Save refresh token
     await userService.saveRefreshToken(user.id, refreshToken);
@@ -145,12 +150,12 @@ export const authService = {
     if (!storedToken.user.isActive) throw new Error("Account is inactive");
 
     // Generate new access token
-    const newAccessToken = generateAccessToken(
-      decoded.userId,
-      storedToken.user.role.id,
-      storedToken.user.role.slug,
-      storedToken.user.agentId,
-    );
+    const tokenPayload: JWTAccessTokenType = {
+      userId: decoded.userId,
+      roleId: storedToken.user.role.id,
+      roleSlug: storedToken.user.role.slug,
+    };
+    const newAccessToken = generateAccessToken(tokenPayload);
 
     return {
       accessToken: newAccessToken,

@@ -1,14 +1,15 @@
 import jwt from "jsonwebtoken";
 import { appConfig } from "@/config/app.config";
+import { JWTAccessTokenType, JWTRefreshTokenType } from "@/types";
 
-export const generateAccessToken = (userId: number, roleId: number, roleSlug: string, agentId: number | null) => {
-  return jwt.sign({ userId, roleId, roleSlug, agentId }, appConfig.jwtAccessSecret!, {
+export const generateAccessToken = (payload: JWTAccessTokenType) => {
+  return jwt.sign(payload, appConfig.jwtAccessSecret!, {
     expiresIn: appConfig.jwtAccessExpiry as any,
   });
 };
 
-export const generateRefreshToken = (userId: number) => {
-  return jwt.sign({userId}, appConfig.jwtRefreshSecret!, {
+export const generateRefreshToken = (payload: JWTRefreshTokenType) => {
+  return jwt.sign(payload, appConfig.jwtRefreshSecret!, {
     expiresIn: appConfig.jwtRefreshExpiry as any,
   });
 };

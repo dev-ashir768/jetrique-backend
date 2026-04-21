@@ -5,7 +5,6 @@ declare global {
         userId: number;
         roleId: number;
         roleSlug: string;
-        agentId: number | null;
       };
     }
   }
