@@ -19,6 +19,17 @@ enum AccountStatus {
   PENDING
 }
 
+enum AgentType {
+  INDIVIDUAL_AGENT
+  PSA
+  SUB_AGENT
+}
+
+enum IdentityType {
+  CNIC
+  PASSPORT
+}
+
 // ─────────────────────────────
 // ROLE
 // ─────────────────────────────
@@ -92,9 +103,13 @@ model RolePermission {
 // AGENT
 // ─────────────────────────────
 model Agent {
-  id       Int    @id @default(autoincrement())
-  fullName String
-  email    String @unique
+  id          Int       @id @default(autoincrement())
+  fullName    String
+  email       String    @unique
+  phone       String?
+  agentType   AgentType
+  companyName String?
+  cnic        String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -133,7 +148,8 @@ model User {
   updatedBy Int?
   deletedBy Int?
 
-  isActive Boolean @default(true)
+  isActive Boolean       @default(true)
+  status   AccountStatus @default(PENDING)
 
   roleId Int
   role   Role @relation(fields: [roleId], references: [id])
