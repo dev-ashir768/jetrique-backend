@@ -15,6 +15,7 @@ import {
 import { userService } from "../user/user.service";
 import { roleService } from "../role/role.service";
 import { JWTAccessTokenType, JWTRefreshTokenType } from "@/types";
+import { AppError } from "@/middleware/error.middleware";
 
 export const authService = {
   registerAgent: async (payload: RegisterFormType) => {
@@ -25,11 +26,11 @@ export const authService = {
     const role = await roleService.getRoleById(roleId);
 
     if (existingUser) {
-      throw new Error("Email already registered");
+      throw new AppError("Email already registered", 409);
     }
 
     if (!role) {
-      throw new Error("Role not found");
+      throw new AppError("Role not found", 404);
     }
 
     const hashedPassword = await hashPassword(password);
@@ -70,21 +71,27 @@ export const authService = {
 
     // Find user
     const user = await userService.getUserByEmail(email);
-    if (!user) throw new Error("Invalid email or password");
+    if (!user) throw new AppError("Invalid email or password", 400);
 
     // Check password
     const isPasswordMatch = await comparePassword(password, user.password);
-    if (!isPasswordMatch) throw new Error("Invalid email or password");
+    if (!isPasswordMatch) throw new AppError("Invalid email or password", 400);
 
     // Check status
     if (user.status === "PENDING")
-      throw new Error("Your account is pending admin approval");
+      throw new AppError("Your account is pending admin approval", 403);
     if (user.status === "REJECTED")
-      throw new Error("Your account has been rejected. Contact support");
+      throw new AppError(
+        "Your account has been rejected. Contact support",
+        403,
+      );
     if (user.status === "SUSPENDED")
-      throw new Error("Your account has been suspended. Contact support");
+      throw new AppError(
+        "Your account has been suspended. Contact support",
+        403,
+      );
     if (!user.isActive)
-      throw new Error("Your account is inactive. Contact support");
+      throw new AppError("Your account is inactive. Contact support", 403);
 
     // Generate tokens
     const accesssTokenPayload: JWTAccessTokenType = {
@@ -133,7 +140,7 @@ export const authService = {
     try {
       decoded = verifyRefreshToken(refreshToken) as JWTRefreshTokenType;
     } catch (error) {
-      throw new Error("Invalid refresh token");
+      throw new AppError("Invalid refresh token", 401);
     }
 
     // Check in DB
@@ -142,20 +149,27 @@ export const authService = {
       include: { user: { include: { role: true } } },
     });
 
-    if (!storedToken) throw new Error("Refresh token not found");
+    if (!storedToken) throw new AppError("Refresh token not found", 401);
     if (storedToken.isRevoked)
-      throw new Error("Refresh token has been revoked");
+      throw new AppError("Refresh token has been revoked", 401);
     if (storedToken.expiresAt < new Date())
-      throw new Error("Refresh token has expired");
-    if (!storedToken.user.isActive) throw new Error("Account is inactive");
+      throw new AppError("Refresh token has expired", 401);
+    if (!storedToken.user.isActive)
+      throw new AppError("Account is inactive", 403);
 
     // Check user status
     if (storedToken.user.status === "PENDING")
-      throw new Error("Your account is pending admin approval");
+      throw new AppError("Your account is pending admin approval", 403);
     if (storedToken.user.status === "REJECTED")
-      throw new Error("Your account has been rejected. Contact support");
+      throw new AppError(
+        "Your account has been rejected. Contact support",
+        403,
+      );
     if (storedToken.user.status === "SUSPENDED")
-      throw new Error("Your account has been suspended. Contact support");
+      throw new AppError(
+        "Your account has been suspended. Contact support",
+        403,
+      );
 
     // Generate new access token
     const accesssTokenPayload: JWTAccessTokenType = {
@@ -172,10 +186,14 @@ export const authService = {
 
   logout: async (payload: LogoutFormType) => {
     const { refreshToken } = payload;
-    await prisma.refreshToken.updateMany({
-      where: { token: refreshToken },
+    const result = await prisma.refreshToken.updateMany({
+      where: { token: refreshToken, isRevoked: false },
       data: { isRevoked: true },
     });
+
+    if (result.count === 0) {
+      throw new AppError("Invalid token or already logged out", 400);
+    }
 
     return null;
   },
@@ -187,14 +205,14 @@ export const authService = {
 
     // Find user
     const user = await userService.getUserById(userId!);
-    if (!user) throw new Error("User not found.");
+    if (!user) throw new AppError("User not found.", 404);
 
     // Hash new password
     const hashedPassword = await hashPassword(newPassword);
 
     // Check password
     const isPasswordMatch = await comparePassword(oldPassword, user.password);
-    if (!isPasswordMatch) throw new Error("Old password is incorrect");
+    if (!isPasswordMatch) throw new AppError("Old password is incorrect", 400);
 
     await prisma.user.update({
       where: { id: userId },

@@ -2,7 +2,7 @@ import { logger } from "@/config/logger.config";
 import { NextFunction, Request, Response } from "express";
 
 export class AppError extends Error {
-  statusCode = 500;
+  statusCode: number;
 
   constructor(message: string, statusCode: number) {
     super(message);
