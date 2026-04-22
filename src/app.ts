@@ -1,10 +1,11 @@
-import express from "express";
+import express, { NextFunction, Response, Request } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import router from "./routes";
 import { errorHandler } from "./middleware/error.middleware";
 import { morganMiddleware } from "./config/morgan.config";
 import { appConfig } from "./config/app.config";
+import { sendError } from "./utils/response.util";
 
 const app = express();
 
@@ -18,6 +19,13 @@ app.get("/health", (_req, res) => {
 });
 
 app.use(appConfig.apiPrefix!, router);
+
+// Catch 404 routes
+app.use((req: Request, res: Response, _next: NextFunction) => {
+  sendError(res, `Route not found: ${req.method} ${req.originalUrl}`, 404);
+});
+
+// Global error handler
 app.use(errorHandler);
 
 export default app;

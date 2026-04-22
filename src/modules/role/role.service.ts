@@ -8,4 +8,7 @@ export const roleService = {
       },
     });
   },
+  getAllRoles: async () => {
+    return prisma.role.findMany();
+  },
 };
