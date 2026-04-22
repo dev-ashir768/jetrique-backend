@@ -1,5 +1,4 @@
-import bcrypt from "bcryptjs";
-import { prisma } from "../src/config/db.config";
+import { prisma } from '../src/config/db.config';
 
 async function main() {
   // ─────────────────────────────
@@ -187,9 +186,7 @@ async function main() {
   // const superAdminRole = await prisma.role.findUnique({
   //   where: { slug: "super_admin" },
   // });
-
   // const allPermissions = await prisma.permission.findMany();
-
   // for (const perm of allPermissions) {
   //   await prisma.rolePermission.upsert({
   //     where: {

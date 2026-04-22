@@ -1,4 +1,4 @@
-import { prisma } from "@/config/db.config";
+import { prisma } from '@/config/db.config';
 
 export const roleService = {
   getRoleById: async (roleId: number) => {

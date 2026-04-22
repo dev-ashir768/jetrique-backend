@@ -1,7 +1,7 @@
-import asyncHandler from "express-async-handler";
-import { Request, Response } from "express";
-import { authService } from "./auth.service";
-import { sendError, sendSuccess } from "@/utils/response.util";
+import asyncHandler from 'express-async-handler';
+import { Request, Response } from 'express';
+import { authService } from './auth.service';
+import { sendError, sendSuccess } from '@/utils/response.util';
 
 export const authController = {
   registerAgent: asyncHandler(async (req: Request, res: Response) => {
@@ -9,21 +9,21 @@ export const authController = {
     sendSuccess(
       res,
       data,
-      "Registration submitted. Awaiting admin approval.",
+      'Registration submitted. Awaiting admin approval.',
       201,
     );
   }),
 
   login: asyncHandler(async (req: Request, res: Response) => {
     const data = await authService.login(req.body);
-    sendSuccess(res, data, "Login successful");
+    sendSuccess(res, data, 'Login successful');
   }),
 
   changePassword: asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.userId;
     const { newPassword, oldPassword } = req.body;
 
-    if (!userId) sendError(res, "Unauthorized", 404);
+    if (!userId) sendError(res, 'Unauthorized', 404);
 
     const data = await authService.changePassword({
       newPassword,
@@ -33,17 +33,17 @@ export const authController = {
     sendSuccess(
       res,
       data,
-      "Password changed successfully. Please login again.",
+      'Password changed successfully. Please login again.',
     );
   }),
 
   refreshAccessToken: asyncHandler(async (req: Request, res: Response) => {
     const data = await authService.refreshAccessToken(req.body);
-    sendSuccess(res, data, "Access token refreshed successfully");
+    sendSuccess(res, data, 'Access token refreshed successfully');
   }),
 
   logout: asyncHandler(async (req: Request, res: Response) => {
     const data = await authService.logout(req.body);
-    sendSuccess(res, data, "Logout successful");
+    sendSuccess(res, data, 'Logout successful');
   }),
 };

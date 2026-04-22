@@ -1,5 +1,5 @@
-import winston from "winston";
-import { appConfig } from "./app.config";
+import winston from 'winston';
+import { appConfig } from './app.config';
 
 const { combine, timestamp, colorize, printf, json } = winston.format;
 
@@ -8,21 +8,21 @@ const devFormat = printf(({ level, message, timestamp }) => {
 });
 
 export const logger = winston.createLogger({
-  level: "info",
+  level: 'info',
   format: combine(
-    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    appConfig.env === "development" ? combine(colorize(), devFormat) : json(),
+    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    appConfig.env === 'development' ? combine(colorize(), devFormat) : json(),
   ),
   transports: [
     new winston.transports.Console(),
 
     new winston.transports.File({
-      filename: "logs/error.log",
-      level: "error",
+      filename: 'logs/error.log',
+      level: 'error',
     }),
 
     new winston.transports.File({
-      filename: "logs/combined.log",
+      filename: 'logs/combined.log',
     }),
   ],
 });

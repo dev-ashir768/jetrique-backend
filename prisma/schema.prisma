@@ -11,16 +11,9 @@ datasource db {
 // ENUMS
 // ─────────────────────────────
 enum AccountStatus {
-  SUSPENDED
   REJECTED
   APPROVED
   PENDING
-}
-
-enum AgentType {
-  INDIVIDUAL_AGENT
-  PSA
-  SUB_AGENT
 }
 
 enum IdentityType {
@@ -142,7 +135,8 @@ model Agent {
   isActive Boolean       @default(true)
   status   AccountStatus @default(PENDING)
 
-  user User[]
+  user       User[]
+  commission Float? @default(0)
 
   roleId          Int
   role            Role             @relation(fields: [roleId], references: [id])

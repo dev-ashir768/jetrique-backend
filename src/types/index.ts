@@ -9,7 +9,7 @@ export interface JWTRefreshTokenType {
 }
 
 export const enum ValidationSource {
-  BODY = "body",
-  PARAMS = "params",
-  QUERY = "query",
+  BODY = 'body',
+  PARAMS = 'params',
+  QUERY = 'query',
 }
