@@ -1,67 +1,8 @@
-import { AccountStatus } from 'generated/prisma';
+import { AccountStatus, PaymentType } from 'generated/prisma';
 import z from 'zod';
 
-// // ─── Approve Agent ───
-// export const approveAgentSchema = z.object({
-//   // commission: z
-//   //   .number({
-//   //     error: (issue) =>
-//   //       issue.input === undefined
-//   //         ? "Commission is required"
-//   //         : "Commission must be a number",
-//   //   })
-//   //   .min(0, "Commission cannot be negative")
-//   //   .max(100, "Commission cannot exceed 100%"),
-//   status: z.enum([AccountStatus.APPROVED], {
-//     error: (issue) =>
-//       issue.input === undefined
-//         ? "Status is required"
-//         : `Status must be ${Object.values(AccountStatus).join(", ")}`,
-//   }),
-// });
-
-// // ─── Reject Agent ───
-// export const rejectAgentSchema = z.object({
-//   reason: z
-//     .string({
-//       error: (issue) =>
-//         issue.input === undefined
-//           ? "Rejection reason is required"
-//           : "Rejection reason must be a string",
-//     })
-//     .min(10, "Rejection reason must be at least 10 characters")
-//     .max(500, "Rejection reason cannot exceed 500 characters"),
-
-//   status: z.enum([AccountStatus.REJECTED], {
-//     error: (issue) =>
-//       issue.input === undefined
-//         ? "Status is required"
-//         : `Status must be ${Object.values(AccountStatus).join(", ")}`,
-//   }),
-// });
-
-// // ─── Suspend Agent ───
-// export const suspendAgentSchema = z.object({
-//   reason: z
-//     .string({
-//       error: (issue) =>
-//         issue.input === undefined
-//           ? "Suspension reason is required"
-//           : "Suspension reason must be a string",
-//     })
-//     .min(10, "Suspension reason must be at least 10 characters")
-//     .max(500, "Suspension reason cannot exceed 500 characters"),
-
-//   status: z.enum([AccountStatus.SUSPENDED], {
-//     error: (issue) =>
-//       issue.input === undefined
-//         ? "Status is required"
-//         : `Status must be ${Object.values(AccountStatus).join(", ")}`,
-//   }),
-// });
-
-// ─── Agent Status ───
-export const agentStatusSchema = z
+// ─── Update Agent Status ───
+export const updateAgentStatusSchema = z
   .object({
     commission: z
       .number({
@@ -73,11 +14,21 @@ export const agentStatusSchema = z
       .min(0, 'Commission cannot be negative')
       .max(100, 'Commission cannot exceed 100%')
       .optional(),
+    paymentType: z
+      .enum(PaymentType, {
+        error: (issue) =>
+          issue.input === undefined
+            ? 'Payment Type is required'
+            : `Payment Type must be one of ${Object.values(PaymentType).join(
+                ', ',
+              )}`,
+      })
+      .optional(),
     status: z.enum(AccountStatus, {
       error: (issue) =>
         issue.input === undefined
           ? 'Status is required'
-          : `Status must be ${Object.values(AccountStatus).join(', ')}`,
+          : `Status must be one of ${Object.values(AccountStatus).join(', ')}`,
     }),
     reason: z
       .string({
@@ -103,10 +54,13 @@ export const agentStatusSchema = z
         message: 'Reason is required when rejecting agent',
       });
     }
+    if (data.status === 'APPROVED' && data.paymentType === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['paymentType'],
+        message: 'Payment type is required when approving agent',
+      });
+    }
   });
 
-// export type ApproveAgentFormType = z.infer<typeof approveAgentSchema>;
-// export type RejectAgentFormType = z.infer<typeof rejectAgentSchema>;
-// export type SuspendAgentFormType = z.infer<typeof suspendAgentSchema>;
-
-export type AgentStatusFormType = z.infer<typeof agentStatusSchema>;
+export type UpdateAgentStatusFormType = z.infer<typeof updateAgentStatusSchema>;

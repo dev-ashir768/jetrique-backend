@@ -21,6 +21,13 @@ enum IdentityType {
   PASSPORT
 }
 
+enum PaymentType {
+  ONLINE
+  // WALLET
+  // CREDIT
+  // CASH
+}
+
 // ─────────────────────────────
 // ROLE
 // ─────────────────────────────
@@ -115,12 +122,14 @@ model RefreshToken {
 // AGENT
 // ─────────────────────────────
 model Agent {
-  id          Int     @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   fullName    String
-  email       String  @unique
+  email       String       @unique
   companyName String?
   phone       String?
   cnic        String
+  commission  Float?       @default(0)
+  paymentType PaymentType?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -135,8 +144,7 @@ model Agent {
   isActive Boolean       @default(true)
   status   AccountStatus @default(PENDING)
 
-  user       User[]
-  commission Float? @default(0)
+  user User[]
 
   roleId          Int
   role            Role             @relation(fields: [roleId], references: [id])

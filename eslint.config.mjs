@@ -1,17 +1,22 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default [
-  {
-    ignores: ['generated/**', 'node_modules/**', 'dist/**'],
-  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
-  eslintConfigPrettier,
+  eslintPluginPrettierRecommended,
   {
+    files: ['src/**/*.ts', 'src/**/*.js'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_' },
+      ],
     },
+  },
+  {
+    ignores: ['dist/', 'node_modules/', 'generated/', 'jest.config.js'],
   },
 ];
