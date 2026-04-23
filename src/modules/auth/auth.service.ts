@@ -17,6 +17,7 @@ import { roleService } from '../role/role.service';
 import { JWTAccessTokenType, JWTRefreshTokenType } from '@/types';
 import { AppError } from '@/middleware/error.middleware';
 import { logger } from '@/config/logger.config';
+import { Prisma } from '@generated/prisma';
 
 export const authService = {
   registerAgent: async (payload: RegisterFormType) => {
@@ -36,31 +37,33 @@ export const authService = {
 
     const hashedPassword = await hashPassword(password);
 
-    const result = await prisma.$transaction(async (tx) => {
-      const agent = await tx.agent.create({
-        data: {
-          fullName,
-          email,
-          companyName,
-          phone,
-          cnic,
-          status: 'PENDING',
-          roleId: role.id,
-        },
-      });
-      const user = await tx.user.create({
-        data: {
-          fullName,
-          email,
-          phone,
-          password: hashedPassword,
-          status: 'PENDING',
-          roleId: role.id,
-          agentId: agent.id,
-        },
-      });
-      return { agent, user };
-    });
+    const result = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const agent = await tx.agent.create({
+          data: {
+            fullName,
+            email,
+            companyName,
+            phone,
+            cnic,
+            status: 'PENDING',
+            roleId: role.id,
+          },
+        });
+        const user = await tx.user.create({
+          data: {
+            fullName,
+            email,
+            phone,
+            password: hashedPassword,
+            status: 'PENDING',
+            roleId: role.id,
+            agentId: agent.id,
+          },
+        });
+        return { agent, user };
+      },
+    );
 
     return {
       agentId: result.agent.id,

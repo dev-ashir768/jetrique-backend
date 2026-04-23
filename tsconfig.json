@@ -26,11 +26,12 @@
       "@modules/*": ["src/modules/*"],
       "@middleware/*": ["src/middleware/*"],
       "@utils/*": ["src/utils/*"],
-      "@types/*": ["src/types/*"]
+      "@types/*": ["src/types/*"],
+      "@generated/*": ["src/generated/*"]
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "prisma"],
+  "exclude": ["node_modules", "dist"],
   "ts-node": {
     "files": true,
     "transpileOnly": true,

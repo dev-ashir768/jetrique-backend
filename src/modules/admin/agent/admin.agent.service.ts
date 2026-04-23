@@ -6,7 +6,7 @@ import {
 import { AppError } from '@/middleware/error.middleware';
 import { userService } from '@/modules/user/user.service';
 import { StatusCodes } from 'http-status-codes';
-import { Prisma } from 'generated/prisma';
+import { Prisma } from '@generated/prisma';
 
 export const adminAgentService = {
   updateAgentStatus: async (
@@ -47,7 +47,7 @@ export const adminAgentService = {
       );
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.agent.update({
         where: { id: agentId },
         data: {
