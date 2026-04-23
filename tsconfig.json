@@ -26,8 +26,7 @@
       "@modules/*": ["src/modules/*"],
       "@middleware/*": ["src/middleware/*"],
       "@utils/*": ["src/utils/*"],
-      "@types/*": ["src/types/*"],
-      "@generated/*": ["src/generated/*"]
+      "@types/*": ["src/types/*"]
     }
   },
   "include": ["src/**/*"],
