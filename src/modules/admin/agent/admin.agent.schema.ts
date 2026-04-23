@@ -61,6 +61,20 @@ export const updateAgentStatusSchema = z
         message: 'Payment type is required when approving agent',
       });
     }
+    if (data.status === 'REJECTED' && data.paymentType !== undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['paymentType'],
+        message: 'Payment type is not required when rejecting agent',
+      });
+    }
+    if (data.status === 'REJECTED' && data.commission !== undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['commission'],
+        message: 'Commission is not required when rejecting agent',
+      });
+    }
   });
 
 export type UpdateAgentStatusFormType = z.infer<typeof updateAgentStatusSchema>;

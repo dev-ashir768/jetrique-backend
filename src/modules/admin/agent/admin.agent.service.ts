@@ -2,6 +2,7 @@ import { prisma } from '@/config/db.config';
 import { UpdateAgentStatusFormType } from './admin.agent.schema';
 import { AppError } from '@/middleware/error.middleware';
 import { userService } from '@/modules/user/user.service';
+import { StatusCodes } from 'http-status-codes';
 
 export const adminAgentService = {
   updateAgentStatus: async (
@@ -26,13 +27,11 @@ export const adminAgentService = {
 
     //  Check status
     if (agent.status === status) {
-      throw new AppError(`Agent is already ${status.toLowerCase()}`, 400);
+      throw new AppError(`Agent is already ${status.toLowerCase()}`, StatusCodes.BAD_REQUEST);
     }
     if (agent.status === 'REJECTED' && status === 'APPROVED') {
-      throw new AppError('Rejected agent cannot be approved directly', 400);
+      throw new AppError('Rejected agent cannot be approved directly', StatusCodes.BAD_REQUEST);
     }
-    if (agent.status === 'PENDING' && status === 'REJECTED')
-      throw new AppError('Pending agent cannot be rejected directly', 400);
 
     await prisma.$transaction(async (tx) => {
       await tx.agent.update({
@@ -75,7 +74,7 @@ export const adminAgentService = {
     });
 
     return {
-      message: `${status.toLowerCase()} agent successfully`,
+      message: `Agent ${status.toLowerCase()} successfully`,
     };
   },
 };

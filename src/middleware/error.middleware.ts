@@ -1,5 +1,5 @@
 import { logger } from '@/config/logger.config';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 export class AppError extends Error {
@@ -11,7 +11,7 @@ export class AppError extends Error {
   }
 }
 
-export const errorHandler = (err: Error, _req: Request, res: Response) => {
+export const errorHandler = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
   const statusCode =
     err instanceof AppError
       ? err.statusCode
