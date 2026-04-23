@@ -1,5 +1,6 @@
 import { logger } from '@/config/logger.config';
 import { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 export class AppError extends Error {
   statusCode: number;
@@ -14,8 +15,8 @@ export const errorHandler = (err: Error, _req: Request, res: Response) => {
   const statusCode =
     err instanceof AppError
       ? err.statusCode
-      : res.statusCode === 200
-        ? 500
+      : res.statusCode === StatusCodes.OK
+        ? StatusCodes.INTERNAL_SERVER_ERROR
         : res.statusCode;
 
   logger.error(`${statusCode} - ${err.message}`);

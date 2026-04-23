@@ -1,11 +1,12 @@
 import { Response } from 'express';
 import z, { ZodError } from 'zod';
+import { StatusCodes } from 'http-status-codes';
 
 export const sendSuccess = (
   res: Response,
   data: unknown,
   message: string = 'Success',
-  statusCode: number = 200,
+  statusCode: number = StatusCodes.OK,
 ) => {
   res.status(statusCode).json({
     success: true,
@@ -17,7 +18,7 @@ export const sendSuccess = (
 export const sendError = (
   res: Response,
   message: string = 'Something went wrong',
-  statusCode: number = 400,
+  statusCode: number = StatusCodes.BAD_REQUEST,
   error?: ZodError,
 ) => {
   res.status(statusCode).json({

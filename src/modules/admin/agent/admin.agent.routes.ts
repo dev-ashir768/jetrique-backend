@@ -6,30 +6,7 @@ import { authMiddleware } from '@/middleware/auth.middleware';
 
 const router = Router();
 
-// router.patch(
-//   "/approve/:agentId",
-//   authMiddleware.verifyAccessToken,
-//   authMiddleware.authorize(["super_admin"]),
-//   validate(approveAgentSchema),
-//   adminAgentController.approveAgent,
-// );
-
-// router.patch(
-//   "/reject/:agentId",
-//   authMiddleware.verifyAccessToken,
-//   authMiddleware.authorize(["super_admin"]),
-//   validate(rejectAgentSchema),
-//   adminAgentController.rejectAgent,
-// );
-
-// router.patch(
-//   "/suspend/:agentId",
-//   authMiddleware.verifyAccessToken,
-//   authMiddleware.authorize(["super_admin"]),
-//   validate(suspendAgentSchema),
-//   adminAgentController.suspendAgent,
-// );
-
+// Agent Status Change
 router.patch(
   '/status/:agentId',
   authMiddleware.verifyAccessToken,
