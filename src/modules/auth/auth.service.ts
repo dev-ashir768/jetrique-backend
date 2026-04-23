@@ -17,7 +17,7 @@ import { roleService } from '../role/role.service';
 import { JWTAccessTokenType, JWTRefreshTokenType } from '@/types';
 import { AppError } from '@/middleware/error.middleware';
 import { logger } from '@/config/logger.config';
-import { Prisma } from '@generated/prisma';
+import { Prisma } from '@prisma/client';
 
 export const authService = {
   registerAgent: async (payload: RegisterFormType) => {

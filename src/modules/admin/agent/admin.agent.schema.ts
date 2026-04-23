@@ -1,4 +1,4 @@
-import { AgentStatus, PaymentType } from '@generated/prisma';
+import { AgentStatus, PaymentType } from '@prisma/client';
 import z from 'zod';
 
 // ─── Update Agent Status ───
