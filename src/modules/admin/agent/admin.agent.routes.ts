@@ -1,18 +1,33 @@
 import { Router } from 'express';
 import { adminAgentController } from './admin.agent.controller';
 import { validate } from '@/middleware/validate.middleware';
-import { updateAgentStatusSchema } from './admin.agent.schema';
+import { getAgentsSchema, updateAgentStatusSchema } from './admin.agent.schema';
 import { authMiddleware } from '@/middleware/auth.middleware';
+import { ValidationSource } from '@/types';
 
 const router = Router();
 
-// Agent Status Change
-router.patch(
-  '/status/:agentId',
+// ─── All routes: Super Admin only ───
+router.use(
   authMiddleware.verifyAccessToken,
   authMiddleware.authorize(['super_admin']),
+);
+
+// ─── Update Agent Status (Approve / Reject) ───
+router.patch(
+  '/status/:agentId',
   validate(updateAgentStatusSchema),
   adminAgentController.updateAgentStatus,
 );
+
+// ─── Get all Agents ───
+router.get(
+  '/',
+  validate(getAgentsSchema, ValidationSource.QUERY),
+  adminAgentController.getAgents,
+);
+
+// ─── Get Agent by Id ───
+router.get('/:agentId', adminAgentController.getAgentById);
 
 export default router;

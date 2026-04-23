@@ -13,3 +13,10 @@ export const enum ValidationSource {
   PARAMS = 'params',
   QUERY = 'query',
 }
+
+export interface Meta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}

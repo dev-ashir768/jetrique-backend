@@ -14,7 +14,13 @@ export const validate = (
       sendError(res, 'Validation failed', 422, result.error);
       return;
     }
-    req[source] = result.data;
+
+    if (source === ValidationSource.QUERY) {
+      Object.assign(req.query, result.data);
+    } else {
+      req[source] = result.data;
+    }
+
     next();
   };
 };

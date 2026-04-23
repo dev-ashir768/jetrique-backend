@@ -10,7 +10,7 @@ datasource db {
 // ─────────────────────────────
 // ENUMS
 // ─────────────────────────────
-enum AccountStatus {
+enum AgentStatus {
   REJECTED
   APPROVED
   PENDING
@@ -141,8 +141,8 @@ model Agent {
   approvedBy Int?
   approvedAt DateTime?
 
-  isActive Boolean       @default(true)
-  status   AccountStatus @default(PENDING)
+  isActive Boolean     @default(true)
+  status   AgentStatus @default(PENDING)
 
   user User[]
 
@@ -160,10 +160,10 @@ model Agent {
 // AGENT STATUS LOG
 // ─────────────────────────────
 model AgentStatusLog {
-  id        Int           @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   agentId   Int
-  agent     Agent         @relation(fields: [agentId], references: [id])
-  status    AccountStatus
+  agent     Agent       @relation(fields: [agentId], references: [id])
+  status    AgentStatus
   changedBy Int?
   reason    String?
 
@@ -189,8 +189,8 @@ model User {
   updatedBy Int?
   deletedBy Int?
 
-  isActive Boolean       @default(true)
-  status   AccountStatus @default(PENDING)
+  isActive Boolean     @default(true)
+  status   AgentStatus @default(PENDING)
 
   roleId Int
   role   Role @relation(fields: [roleId], references: [id])

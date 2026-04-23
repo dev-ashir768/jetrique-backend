@@ -1,4 +1,4 @@
-import { AccountStatus, PaymentType } from 'generated/prisma';
+import { AgentStatus, PaymentType } from 'generated/prisma';
 import z from 'zod';
 
 // ─── Update Agent Status ───
@@ -24,11 +24,11 @@ export const updateAgentStatusSchema = z
               )}`,
       })
       .optional(),
-    status: z.enum(AccountStatus, {
+    status: z.enum(AgentStatus, {
       error: (issue) =>
         issue.input === undefined
           ? 'Status is required'
-          : `Status must be one of ${Object.values(AccountStatus).join(', ')}`,
+          : `Status must be one of ${Object.values(AgentStatus).join(', ')}`,
     }),
     reason: z
       .string({
@@ -77,4 +77,41 @@ export const updateAgentStatusSchema = z
     }
   });
 
+// ─── Get Agents ───
+export const getAgentsSchema = z.object({
+  status: z
+    .enum(AgentStatus, {
+      error: (issue) =>
+        issue.input === undefined
+          ? 'Status is required'
+          : `Status must be one of ${Object.values(AgentStatus).join(', ')}`,
+    })
+    .optional(),
+  search: z
+    .string({
+      error: (issue) =>
+        issue?.input === undefined
+          ? 'Search is required'
+          : 'Search must be a string',
+    })
+    .optional(),
+  page: z
+    .string({
+      error: (issue) =>
+        issue?.input === undefined
+          ? 'Page is required'
+          : 'Page must be a string',
+    })
+    .optional(),
+  limit: z
+    .string({
+      error: (issue) =>
+        issue?.input === undefined
+          ? 'Limit is required'
+          : 'Limit must be a string',
+    })
+    .optional(),
+});
+
 export type UpdateAgentStatusFormType = z.infer<typeof updateAgentStatusSchema>;
+export type GetAgentsFormType = z.infer<typeof getAgentsSchema>;

@@ -1,17 +1,20 @@
 import { Response } from 'express';
 import z, { ZodError } from 'zod';
 import { StatusCodes } from 'http-status-codes';
+import { Meta } from '@/types';
 
 export const sendSuccess = (
   res: Response,
   data: unknown,
   message: string = 'Success',
   statusCode: number = StatusCodes.OK,
+  meta?: Meta,
 ) => {
   res.status(statusCode).json({
     success: true,
     message,
     data,
+    ...(meta && { meta }),
   });
 };
 
