@@ -153,6 +153,7 @@ model Agent {
   agentStatusLogs AgentStatusLog[]
   commissionLogs  CommissionLogs[]
   paymentTypeLogs PaymentTypeLogs[]
+  // agentAuditLogs  AgentAuditLog[]
 
   @@map("agents")
 }
@@ -204,12 +205,13 @@ model AgentStatusLog {
 }
 
 model CommissionLogs {
-  id         Int     @id @default(autoincrement())
-  agentId    Int
-  agent      Agent   @relation(fields: [agentId], references: [id])
-  commission Float
-  changedBy  Int?
-  reason     String?
+  id            Int     @id @default(autoincrement())
+  agentId       Int
+  agent         Agent   @relation(fields: [agentId], references: [id])
+  oldCommission Float
+  newCommission Float
+  changedBy     Int
+  reason        String?
 
   createdAt DateTime @default(now())
 
@@ -217,12 +219,13 @@ model CommissionLogs {
 }
 
 model PaymentTypeLogs {
-  id          Int         @id @default(autoincrement())
-  agentId     Int
-  agent       Agent       @relation(fields: [agentId], references: [id])
-  paymentType PaymentType
-  changedBy   Int?
-  reason      String?
+  id             Int          @id @default(autoincrement())
+  agentId        Int
+  agent          Agent        @relation(fields: [agentId], references: [id])
+  oldPaymentType PaymentType?
+  newPaymentType PaymentType
+  changedBy      Int
+  reason         String?
 
   createdAt DateTime @default(now())
 

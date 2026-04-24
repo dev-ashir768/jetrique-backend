@@ -87,26 +87,30 @@ export const adminAgentService = {
         },
       });
 
-      if (commission !== undefined) {
-        await tx.commissionLogs.create({
-          data: {
-            agentId,
-            commission,
-            changedBy: superAdminId,
-            reason: `Commission has been changed from ${agent.commission} to ${commission}`,
-          },
-        });
-      }
+      if (status === 'APPROVED') {
+        if (commission !== undefined && commission !== agent.commission) {
+          await tx.commissionLogs.create({
+            data: {
+              agentId,
+              newCommission: commission,
+              oldCommission: agent.commission || 0,
+              changedBy: superAdminId,
+              reason: `Commission has been changed from ${agent.commission} to ${commission}`,
+            },
+          });
+        }
 
-      if (paymentType !== undefined) {
-        await tx.paymentTypeLogs.create({
-          data: {
-            agentId,
-            paymentType,
-            changedBy: superAdminId,
-            reason: `Payment type has been changed from ${agent.paymentType} to ${paymentType}`,
-          },
-        });
+        if (paymentType !== undefined && paymentType !== agent.paymentType) {
+          await tx.paymentTypeLogs.create({
+            data: {
+              agentId,
+              newPaymentType: paymentType,
+              oldPaymentType: agent.paymentType,
+              changedBy: superAdminId,
+              reason: `Payment type has been changed from ${agent.paymentType} to ${paymentType}`,
+            },
+          });
+        }
       }
     });
 
