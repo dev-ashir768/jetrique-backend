@@ -2,6 +2,7 @@ import { Response, Request } from 'express';
 import asyncHandler from 'express-async-handler';
 import { auditTrailService } from './audit-trail.service';
 import {
+  GetAgentStatusLogsFormType,
   GetCommissionLogsFormType,
   GetPaymentTypeLogsFormType,
 } from './audit-trail.schema';
@@ -32,6 +33,20 @@ export const auditTrailController = {
       res,
       data.paymentTypeLogs,
       'Payment Type Logs Fetched Successfully',
+      StatusCodes.OK,
+      data.meta,
+    );
+  }),
+
+  // ─── Get Agent Status Logs ───
+  getAgentStatusLogs: asyncHandler(async (req: Request, res: Response) => {
+    const data = await auditTrailService.getAgentStatusLogs(
+      req.query as GetAgentStatusLogsFormType,
+    );
+    sendSuccess(
+      res,
+      data.agentStatusLogs,
+      'Agent Status Logs Fetched Successfully',
       StatusCodes.OK,
       data.meta,
     );

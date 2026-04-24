@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import {
+  GetAgentStatusLogsFormType,
   GetCommissionLogsFormType,
   GetPaymentTypeLogsFormType,
 } from './audit-trail.schema';
@@ -44,6 +45,9 @@ export const auditTrailService = {
               phone: true,
               cnic: true,
               createdBy: true,
+              role: {
+                select: { id: true, name: true, slug: true },
+              },
             },
           },
         },
@@ -90,7 +94,7 @@ export const auditTrailService = {
       }),
     };
 
-     const [paymentTypeLogs, total] = await prisma.$transaction([
+    const [paymentTypeLogs, total] = await prisma.$transaction([
       prisma.paymentTypeLogs.findMany({
         where,
         include: {
@@ -102,6 +106,9 @@ export const auditTrailService = {
               phone: true,
               cnic: true,
               createdBy: true,
+              role: {
+                select: { id: true, name: true, slug: true },
+              },
             },
           },
         },
@@ -115,6 +122,54 @@ export const auditTrailService = {
 
     return {
       paymentTypeLogs,
+      meta: {
+        total,
+        page: Number(page),
+        limit: Number(take),
+        totalPages: Math.ceil(total / take),
+      },
+    };
+  },
+
+  // ─── Get Agent Status Logs ───
+  getAgentStatusLogs: async (query: GetAgentStatusLogsFormType) => {
+    const { limit = '10', page = '1', status } = query;
+
+    const take = parseInt(limit);
+    const skip = (parseInt(page) - 1) * take;
+
+    const where: Prisma.AgentStatusLogWhereInput = {
+      ...(status !== undefined && { status }),
+    };
+
+    const [agentStatusLogs, total] = await prisma.$transaction([
+      prisma.agentStatusLog.findMany({
+        where,
+        include: {
+          agent: {
+            select: {
+              companyName: true,
+              fullName: true,
+              email: true,
+              phone: true,
+              cnic: true,
+              createdBy: true,
+              role: {
+                select: { id: true, name: true, slug: true },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take,
+        skip,
+      }),
+
+      prisma.agentStatusLog.count({ where }),
+    ]);
+
+    return {
+      agentStatusLogs,
       meta: {
         total,
         page: Number(page),
