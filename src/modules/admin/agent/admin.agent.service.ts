@@ -1,6 +1,7 @@
 import { prisma } from '@/config/db.config';
 import {
   GetAgentsFormType,
+  UpdateAgentFinanceFormType,
   UpdateAgentStatusFormType,
 } from './admin.agent.schema';
 import { AppError } from '@/middleware/error.middleware';
@@ -41,9 +42,9 @@ export const adminAgentService = {
         StatusCodes.BAD_REQUEST,
       );
     }
-    if (agent.status === 'REJECTED' && status === 'APPROVED') {
+    if (agent.status === 'APPROVED' && status === 'REJECTED') {
       throw new AppError(
-        'Rejected agent cannot be approved directly',
+        'Approved agent cannot be rejected.',
         StatusCodes.BAD_REQUEST,
       );
     }
@@ -53,7 +54,7 @@ export const adminAgentService = {
         where: { id: agentId },
         data: {
           status,
-          isActive: status === 'APPROVED',
+          // isActive: status === 'APPROVED',
           ...(status === 'APPROVED' && {
             commission,
             paymentType,
@@ -67,7 +68,7 @@ export const adminAgentService = {
         where: { agentId },
         data: {
           status,
-          isActive: status === 'APPROVED',
+          // isActive: status === 'APPROVED',
         },
       });
 
@@ -117,6 +118,68 @@ export const adminAgentService = {
     return {
       message: `Agent ${status.toLowerCase()} successfully`,
     };
+  },
+
+  // ─── Update Agent Finance ───
+  updateAgentFinance: async (
+    payload: UpdateAgentFinanceFormType,
+    agentId: number,
+    superAdminId: number,
+  ) => {
+    const { commission, paymentType, reason } = payload;
+
+    const agent = await adminAgentService.getAgentById(agentId);
+
+    if (!agent) throw new AppError('Agent not found', StatusCodes.NOT_FOUND);
+
+    if (agent.status !== 'APPROVED') {
+      throw new AppError(
+        'Only approved agents can be updated',
+        StatusCodes.BAD_REQUEST,
+      );
+    }
+
+    if (agent.commission === commission && agent.paymentType === paymentType)
+      throw new AppError(
+        'No changes in agent finance',
+        StatusCodes.BAD_REQUEST,
+      );
+
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      await tx.agent.update({
+        where: { id: agentId },
+        data: {
+          ...(commission !== undefined && { commission }),
+          ...(paymentType !== undefined && { paymentType }),
+        },
+      });
+
+      if (commission !== undefined && commission !== agent.commission) {
+        await tx.commissionLogs.create({
+          data: {
+            agentId,
+            newCommission: commission,
+            oldCommission: agent.commission || 0,
+            changedBy: superAdminId,
+            reason: reason || 'Commission updated by Super Admin',
+          },
+        });
+      }
+
+      if (paymentType !== undefined && paymentType !== agent.paymentType) {
+        await tx.paymentTypeLogs.create({
+          data: {
+            agentId,
+            newPaymentType: paymentType,
+            oldPaymentType: agent.paymentType,
+            changedBy: superAdminId,
+            reason: reason || 'Payment Type updated by Super Admin',
+          },
+        });
+      }
+    });
+
+    return {}
   },
 
   // ─── Get Agents ───

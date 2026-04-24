@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { adminAgentController } from './admin.agent.controller';
 import { validate } from '@/middleware/validate.middleware';
-import { getAgentsSchema, updateAgentStatusSchema } from './admin.agent.schema';
+import { getAgentsSchema, updateAgentFinanceSchema, updateAgentStatusSchema } from './admin.agent.schema';
 import { authMiddleware } from '@/middleware/auth.middleware';
 import { ValidationSource } from '@/types';
 
@@ -20,6 +20,12 @@ router.patch(
   adminAgentController.updateAgentStatus,
 );
 
+// ─── Update Agent Finance ───
+router.patch(
+  '/finance/:agentId',
+  validate(updateAgentFinanceSchema),
+  adminAgentController.updateAgentFinance,
+);
 // ─── Get all Agents ───
 router.get(
   '/',

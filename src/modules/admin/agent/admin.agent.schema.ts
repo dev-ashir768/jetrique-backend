@@ -77,6 +77,37 @@ export const updateAgentStatusSchema = z
     }
   });
 
+// ─── Update Agent Finance ───
+export const updateAgentFinanceSchema = z.object({
+  commission: z
+    .number({
+      error: (issue) =>
+        issue.input === undefined
+          ? 'Commission is required'
+          : 'Commission must be a number',
+    })
+    .min(0, 'Commission cannot be negative')
+    .max(100, 'Commission cannot exceed 100%')
+    .optional(),
+  paymentType: z
+    .enum(PaymentType, {
+      error: (issue) =>
+        issue.input === undefined
+          ? 'Payment Type is required'
+          : `Payment Type must be one of ${Object.values(PaymentType).join(
+              ', ',
+            )}`,
+    })
+    .optional(),
+  reason: z
+    .string({
+      error: (issue) =>
+        issue.input === '' ? 'Reason is required' : 'Reason must be a string',
+    })
+    .min(10, 'Reason must be at least 10 characters')
+    .max(500, 'Reason cannot exceed 500 characters'),
+});
+
 // ─── Get Agents ───
 export const getAgentsSchema = z.object({
   status: z
@@ -115,3 +146,4 @@ export const getAgentsSchema = z.object({
 
 export type UpdateAgentStatusFormType = z.infer<typeof updateAgentStatusSchema>;
 export type GetAgentsFormType = z.infer<typeof getAgentsSchema>;
+export type UpdateAgentFinanceFormType = z.infer<typeof updateAgentFinanceSchema>;
