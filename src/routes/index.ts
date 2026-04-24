@@ -9,6 +9,6 @@ const router = Router();
 router.use('/auth', authRoutes);
 router.use('/role', roleRoutes);
 router.use('/admin/agent', adminAgentRoutes);
-router.use('/audit-trail', auditTrailRoutes)
+router.use('/audit-trail', auditTrailRoutes);
 
 export default router;
