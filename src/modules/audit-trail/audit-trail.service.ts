@@ -5,19 +5,17 @@ import {
   GetPaymentTypeLogsFormType,
 } from './audit-trail.schema';
 import { prisma } from '@/config/db.config';
+import { startOfDay, endOfDay } from 'date-fns';
 
 export const auditTrailService = {
   // ─── Get Commission Logs ───
   getCommissionLogs: async (query: GetCommissionLogsFormType) => {
-    const { search, page = '1', limit = '10' } = query;
+    const { search, page = '1', limit = '10', startDate, endDate } = query;
 
     const take = parseInt(limit);
     const skip = (parseInt(page) - 1) * take;
 
-    const searchNumber = search ? parseFloat(search) : undefined;
-
     const where: Prisma.CommissionLogsWhereInput = {
-      ...(searchNumber !== undefined && { commission: searchNumber }),
       ...(search && {
         OR: [
           {
@@ -31,6 +29,8 @@ export const auditTrailService = {
           },
         ],
       }),
+      ...(startDate && { createdAt: { gte: startOfDay(startDate) } }),
+      ...(endDate && { createdAt: { lte: endOfDay(endDate) } }),
     };
 
     const [commissionLogs, total] = await prisma.$transaction([
@@ -72,7 +72,14 @@ export const auditTrailService = {
 
   // ─── Get Payment Type Logs ───
   getPaymentTypeLogs: async (query: GetPaymentTypeLogsFormType) => {
-    const { limit = '10', page = '1', search, status } = query;
+    const {
+      limit = '10',
+      page = '1',
+      search,
+      status,
+      startDate,
+      endDate,
+    } = query;
 
     const take = parseInt(limit);
     const skip = (parseInt(page) - 1) * take;
@@ -92,6 +99,8 @@ export const auditTrailService = {
           },
         ],
       }),
+      ...(startDate && { createdAt: { gte: startOfDay(startDate) } }),
+      ...(endDate && { createdAt: { lte: endOfDay(endDate) } }),
     };
 
     const [paymentTypeLogs, total] = await prisma.$transaction([
@@ -133,13 +142,15 @@ export const auditTrailService = {
 
   // ─── Get Agent Status Logs ───
   getAgentStatusLogs: async (query: GetAgentStatusLogsFormType) => {
-    const { limit = '10', page = '1', status } = query;
+    const { limit = '10', page = '1', status, startDate, endDate } = query;
 
     const take = parseInt(limit);
     const skip = (parseInt(page) - 1) * take;
 
     const where: Prisma.AgentStatusLogWhereInput = {
       ...(status !== undefined && { status }),
+      ...(startDate && { createdAt: { gte: startOfDay(startDate) } }),
+      ...(endDate && { createdAt: { lte: endOfDay(endDate) } }),
     };
 
     const [agentStatusLogs, total] = await prisma.$transaction([
