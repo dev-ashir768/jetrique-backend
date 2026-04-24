@@ -9,6 +9,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Prisma } from '@prisma/client';
 
 export const adminAgentService = {
+  // ─── Update Agent Status ───
   updateAgentStatus: async (
     agentId: number,
     payload: UpdateAgentStatusFormType,
@@ -85,6 +86,28 @@ export const adminAgentService = {
           ...(reason && { reason }),
         },
       });
+
+      if (commission !== undefined) {
+        await tx.commissionLogs.create({
+          data: {
+            agentId,
+            commission,
+            changedBy: superAdminId,
+            reason: `Commission has been changed from ${agent.commission} to ${commission}`,
+          },
+        });
+      }
+
+      if (paymentType !== undefined) {
+        await tx.paymentTypeLogs.create({
+          data: {
+            agentId,
+            paymentType,
+            changedBy: superAdminId,
+            reason: `Payment type has been changed from ${agent.paymentType} to ${paymentType}`,
+          },
+        });
+      }
     });
 
     return {
@@ -92,6 +115,7 @@ export const adminAgentService = {
     };
   },
 
+  // ─── Get Agents ───
   getAgents: async (query: GetAgentsFormType) => {
     const { page = '1', limit = '10', search, status } = query;
 
@@ -137,6 +161,7 @@ export const adminAgentService = {
     };
   },
 
+  // ─── Get Agent by Id ───
   getAgentById: async (agentId: number) => {
     const agent = await prisma.agent.findUnique({
       where: { id: agentId, deletedAt: null },
