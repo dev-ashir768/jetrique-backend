@@ -146,29 +146,15 @@ model Agent {
   user User[]
 
   roleId          Int
-  role            Role             @relation(fields: [roleId], references: [id])
+  role            Role              @relation(fields: [roleId], references: [id])
   psaId           Int?
-  psa             Agent?           @relation("PSAtoSubAgent", fields: [psaId], references: [id])
-  subAgents       Agent[]          @relation("PSAtoSubAgent")
+  psa             Agent?            @relation("PSAtoSubAgent", fields: [psaId], references: [id])
+  subAgents       Agent[]           @relation("PSAtoSubAgent")
   agentStatusLogs AgentStatusLog[]
+  commissionLogs  CommissionLogs[]
+  paymentTypeLogs PaymentTypeLogs[]
 
   @@map("agents")
-}
-
-// ─────────────────────────────
-// AGENT STATUS LOG
-// ─────────────────────────────
-model AgentStatusLog {
-  id        Int         @id @default(autoincrement())
-  agentId   Int
-  agent     Agent       @relation(fields: [agentId], references: [id])
-  status    AgentStatus
-  changedBy Int?
-  reason    String?
-
-  createdAt DateTime @default(now())
-
-  @@map("agent_status_logs")
 }
 
 // ─────────────────────────────
@@ -199,4 +185,46 @@ model User {
   refreshTokens RefreshToken[]
 
   @@map("users")
+}
+
+// ─────────────────────────────
+// LOGS
+// ─────────────────────────────
+model AgentStatusLog {
+  id        Int         @id @default(autoincrement())
+  agentId   Int
+  agent     Agent       @relation(fields: [agentId], references: [id])
+  status    AgentStatus
+  changedBy Int?
+  reason    String?
+
+  createdAt DateTime @default(now())
+
+  @@map("agent_status_logs")
+}
+
+model CommissionLogs {
+  id         Int     @id @default(autoincrement())
+  agentId    Int
+  agent      Agent   @relation(fields: [agentId], references: [id])
+  commission Float
+  changedBy  Int?
+  reason     String?
+
+  createdAt DateTime @default(now())
+
+  @@map("commission_logs")
+}
+
+model PaymentTypeLogs {
+  id          Int         @id @default(autoincrement())
+  agentId     Int
+  agent       Agent       @relation(fields: [agentId], references: [id])
+  paymentType PaymentType
+  changedBy   Int?
+  reason      String?
+
+  createdAt DateTime @default(now())
+
+  @@map("payment_type_logs")
 }
