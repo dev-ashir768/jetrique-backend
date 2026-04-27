@@ -124,18 +124,87 @@ export const authService = {
           slug: user.role.slug,
           name: user.role.name,
         },
-        agent: {
-          id: user.agent?.id,
-          companyName: user.agent?.companyName,
-          phone: user.agent?.phone,
-          cnic: user.agent?.cnic,
-          commission: user.agent?.commission,
-          paymentType: user.agent?.paymentType,
-        },
+        agent: user.agent
+          ? {
+              id: user.agent?.id,
+              companyName: user.agent?.companyName,
+              phone: user.agent?.phone,
+              cnic: user.agent?.cnic,
+              commission: user.agent?.commission,
+              paymentType: user.agent?.paymentType,
+            }
+          : null,
         status: user.status,
       },
       accessToken,
       refreshToken,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      deletedAt: user.deletedAt,
+      createdBy: user.createdBy,
+      updatedBy: user.updatedBy,
+      deletedBy: user.deletedBy,
+      isActive: user.isActive,
+    };
+  },
+
+  getMe: async (requestingUser: JWTAccessTokenType) => {
+    const { userId } = requestingUser;
+
+    const user = await userService.getUserById(userId);
+    if (!user) throw new AppError('User not found.', 404);
+
+    const rolePermissions = await prisma.rolePermission.findMany({
+      where: {
+        roleId: user.roleId,
+        permission: {
+          isActive: true,
+          deletedAt: null,
+        },
+      },
+      select: {
+        permission: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            description: true,
+            icon: true,
+            parentId: true,
+            type: true,
+          },
+        },
+      },
+    });
+    if (!rolePermissions) {
+      throw new AppError('Role permissions not found', 404);
+    }
+
+    const permissions = rolePermissions.map((rp) => rp.permission);
+
+    return {
+      userInfo: {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        role: {
+          id: user.role.id,
+          slug: user.role.slug,
+          name: user.role.name,
+        },
+        agent: user.agent
+          ? {
+              id: user.agent?.id,
+              companyName: user.agent?.companyName,
+              phone: user.agent?.phone,
+              cnic: user.agent?.cnic,
+              commission: user.agent?.commission,
+              paymentType: user.agent?.paymentType,
+            }
+          : null,
+        status: user.status,
+      },
+      permissions,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       deletedAt: user.deletedAt,

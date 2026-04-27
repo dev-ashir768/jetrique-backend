@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import { Request, Response } from 'express';
 import { authService } from './auth.service';
 import { sendError, sendSuccess } from '@/utils/response.util';
+import { JWTAccessTokenType } from '@/types';
 
 export const authController = {
   registerAgent: asyncHandler(async (req: Request, res: Response) => {
@@ -17,6 +18,19 @@ export const authController = {
   login: asyncHandler(async (req: Request, res: Response) => {
     const data = await authService.login(req.body);
     sendSuccess(res, data, 'Login successful');
+  }),
+
+  getMe: asyncHandler(async (req: Request, res: Response) => {
+    const requestingUser = {
+      userId: req.user?.userId,
+      roleSlug: req.user?.roleSlug,
+      roleId: req.user?.roleId,
+      agentId: req.user?.agentId,
+    } as JWTAccessTokenType;
+
+    const data = await authService.getMe(requestingUser);
+
+    sendSuccess(res, data, 'User fetched successfully');
   }),
 
   changePassword: asyncHandler(async (req: Request, res: Response) => {

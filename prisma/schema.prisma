@@ -34,6 +34,11 @@ enum UserRole {
   sub_agent
 }
 
+enum PermissionType {
+  MENU
+  ACTION
+}
+
 // ─────────────────────────────
 // ROLE
 // ─────────────────────────────
@@ -64,11 +69,12 @@ model Role {
 // PERMISSION
 // ─────────────────────────────
 model Permission {
-  id          Int     @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   name        String
   slug        String
   description String?
-  icon        String? @default("House")
+  icon        String?        @default("House")
+  type        PermissionType @default(MENU)
 
   parentId Int?
   parent   Permission?  @relation("PermissionParent", fields: [parentId], references: [id])

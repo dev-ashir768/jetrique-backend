@@ -6,18 +6,19 @@ import { authMiddleware } from '@/middleware/auth.middleware';
 
 const router = Router();
 
+// Public Routes
 router.post('/login', validate(loginSchema), authController.login);
-router.post('/refresh-access-token', authController.refreshAccessToken);
 router.post(
   '/register',
   validate(registerSchema),
   authController.registerAgent,
 );
-router.post(
-  '/logout',
-  authMiddleware.verifyAccessToken,
-  validate(logoutSchema),
-  authController.logout,
-);
+router.post('/refresh-access-token', authController.refreshAccessToken);
+
+// Protected Routes
+router.use(authMiddleware.verifyAccessToken);
+
+router.get('/me', authController.getMe);
+router.post('/logout', validate(logoutSchema), authController.logout);
 
 export default router;
