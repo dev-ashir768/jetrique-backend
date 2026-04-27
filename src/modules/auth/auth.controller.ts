@@ -10,7 +10,7 @@ export const authController = {
     sendSuccess(
       res,
       data,
-      'Registration submitted. Awaiting admin approval.',
+      'Registration submitted. Awaiting super admin approval.',
       201,
     );
   }),

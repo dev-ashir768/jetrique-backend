@@ -11,3 +11,7 @@ export const comparePassword = async (
 ): Promise<boolean> => {
   return bcrypt.compare(password, hash);
 };
+
+export const generatePassword = (): string => {
+  return `SubAgent@${Math.floor(Math.random() * 1000000000)}`;
+};
