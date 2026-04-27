@@ -27,6 +27,13 @@ enum PaymentType {
   // CASH
 }
 
+enum UserRole {
+  super_admin
+  psa
+  individual_agent
+  sub_agent
+}
+
 // ─────────────────────────────
 // ROLE
 // ─────────────────────────────

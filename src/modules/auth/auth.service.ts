@@ -102,6 +102,7 @@ export const authService = {
       userId: user.id,
       roleId: user.role.id,
       roleSlug: user.role.slug,
+      agentId: user.agentId,
     };
     const refreshTokenPayload: JWTRefreshTokenType = {
       userId: user.id,
@@ -114,9 +115,7 @@ export const authService = {
     await userService.saveRefreshToken(user.id, refreshToken);
 
     return {
-      accessToken,
-      refreshToken,
-      user: {
+      userInfo: {
         id: user.id,
         fullName: user.fullName,
         email: user.email,
@@ -125,8 +124,18 @@ export const authService = {
           slug: user.role.slug,
           name: user.role.name,
         },
+        agent: {
+          id: user.agent?.id,
+          companyName: user.agent?.companyName,
+          phone: user.agent?.phone,
+          cnic: user.agent?.cnic,
+          commission: user.agent?.commission,
+          paymentType: user.agent?.paymentType,
+        },
         status: user.status,
       },
+      accessToken,
+      refreshToken,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       deletedAt: user.deletedAt,
@@ -181,6 +190,7 @@ export const authService = {
       userId: decoded.userId,
       roleId: storedToken.user.role.id,
       roleSlug: storedToken.user.role.slug,
+      agentId: storedToken.user.agentId,
     };
     const newAccessToken = generateAccessToken(accesssTokenPayload);
 

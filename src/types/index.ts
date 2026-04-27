@@ -1,5 +1,6 @@
 export interface JWTAccessTokenType {
   userId: number;
+  agentId: number | null;
   roleId: number;
   roleSlug: string;
 }

@@ -8,12 +8,22 @@ import {
 } from './audit-trail.schema';
 import { sendSuccess } from '@/utils/response.util';
 import { StatusCodes } from 'http-status-codes';
+import { JWTAccessTokenType } from '@/types';
 
 export const auditTrailController = {
   // ─── Get Commission Logs ───
   getCommissionLogs: asyncHandler(async (req: Request, res: Response) => {
+    const query = req.query as GetCommissionLogsFormType;
+    const requestingUser = {
+      userId: req.user?.userId,
+      roleSlug: req.user?.roleSlug,
+      roleId: req.user?.roleId,
+      agentId: req.user?.agentId,
+    } as JWTAccessTokenType;
+
     const data = await auditTrailService.getCommissionLogs(
-      req.query as GetCommissionLogsFormType,
+      query,
+      requestingUser,
     );
     sendSuccess(
       res,
@@ -26,8 +36,16 @@ export const auditTrailController = {
 
   // ─── Get Payment Type Logs ───
   getPaymentTypeLogs: asyncHandler(async (req: Request, res: Response) => {
+    const requestingUser = {
+      userId: req.user?.userId,
+      roleSlug: req.user?.roleSlug,
+      roleId: req.user?.roleId,
+      agentId: req.user?.agentId,
+    } as JWTAccessTokenType;
+
     const data = await auditTrailService.getPaymentTypeLogs(
       req.query as GetPaymentTypeLogsFormType,
+      requestingUser,
     );
     sendSuccess(
       res,
@@ -40,8 +58,16 @@ export const auditTrailController = {
 
   // ─── Get Agent Status Logs ───
   getAgentStatusLogs: asyncHandler(async (req: Request, res: Response) => {
+    const requestingUser = {
+      userId: req.user?.userId,
+      roleSlug: req.user?.roleSlug,
+      roleId: req.user?.roleId,
+      agentId: req.user?.agentId,
+    } as JWTAccessTokenType;
+
     const data = await auditTrailService.getAgentStatusLogs(
       req.query as GetAgentStatusLogsFormType,
+      requestingUser,
     );
     sendSuccess(
       res,

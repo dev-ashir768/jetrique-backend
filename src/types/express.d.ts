@@ -3,6 +3,7 @@ declare global {
     interface Request {
       user?: {
         userId: number;
+        agentId: number | null;
         roleId: number;
         roleSlug: string;
       };

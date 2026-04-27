@@ -146,4 +146,6 @@ export const getAgentsSchema = z.object({
 
 export type UpdateAgentStatusFormType = z.infer<typeof updateAgentStatusSchema>;
 export type GetAgentsFormType = z.infer<typeof getAgentsSchema>;
-export type UpdateAgentFinanceFormType = z.infer<typeof updateAgentFinanceSchema>;
+export type UpdateAgentFinanceFormType = z.infer<
+  typeof updateAgentFinanceSchema
+>;

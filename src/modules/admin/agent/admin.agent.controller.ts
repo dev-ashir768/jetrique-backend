@@ -3,7 +3,10 @@ import { Response, Request } from 'express';
 import { adminAgentService } from './admin.agent.service';
 import { sendError, sendSuccess } from '@/utils/response.util';
 import { StatusCodes } from 'http-status-codes';
-import { GetAgentsFormType, UpdateAgentFinanceFormType } from './admin.agent.schema';
+import {
+  GetAgentsFormType,
+  UpdateAgentFinanceFormType,
+} from './admin.agent.schema';
 
 export const adminAgentController = {
   updateAgentStatus: asyncHandler(async (req: Request, res: Response) => {
@@ -60,6 +63,11 @@ export const adminAgentController = {
       adminId,
     );
 
-    sendSuccess(res, data, 'Agent finance updated successfully', StatusCodes.OK);
+    sendSuccess(
+      res,
+      data,
+      'Agent finance updated successfully',
+      StatusCodes.OK,
+    );
   }),
 };

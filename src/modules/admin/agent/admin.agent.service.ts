@@ -7,7 +7,7 @@ import {
 import { AppError } from '@/middleware/error.middleware';
 import { userService } from '@/modules/user/user.service';
 import { StatusCodes } from 'http-status-codes';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 
 export const adminAgentService = {
   // ─── Update Agent Status ───
@@ -22,7 +22,7 @@ export const adminAgentService = {
 
     if (!superAdmin)
       throw new AppError('Super Admin not found', StatusCodes.NOT_FOUND);
-    if (superAdmin.role.slug !== 'super_admin')
+    if (superAdmin.role.slug !== UserRole.super_admin)
       throw new AppError(
         'Only super admin can change agent status',
         StatusCodes.NOT_FOUND,
@@ -179,7 +179,7 @@ export const adminAgentService = {
       }
     });
 
-    return {}
+    return {};
   },
 
   // ─── Get Agents ───

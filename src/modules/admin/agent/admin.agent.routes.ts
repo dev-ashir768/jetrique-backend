@@ -1,16 +1,21 @@
 import { Router } from 'express';
 import { adminAgentController } from './admin.agent.controller';
 import { validate } from '@/middleware/validate.middleware';
-import { getAgentsSchema, updateAgentFinanceSchema, updateAgentStatusSchema } from './admin.agent.schema';
+import {
+  getAgentsSchema,
+  updateAgentFinanceSchema,
+  updateAgentStatusSchema,
+} from './admin.agent.schema';
 import { authMiddleware } from '@/middleware/auth.middleware';
 import { ValidationSource } from '@/types';
+import { UserRole } from '@prisma/client';
 
 const router = Router();
 
 // ─── All routes: Super Admin only ───
 router.use(
   authMiddleware.verifyAccessToken,
-  authMiddleware.authorize(['super_admin']),
+  authMiddleware.authorize([UserRole.super_admin]),
 );
 
 // ─── Update Agent Status (Approve / Reject) ───
