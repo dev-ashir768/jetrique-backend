@@ -7,7 +7,7 @@ import {
 import { prisma } from '@/config/db.config';
 import { startOfDay, endOfDay } from 'date-fns';
 import { JWTAccessTokenType } from '@/types';
-import { getAgentIdFilter } from '@/utils/agent.util';
+import { getAgentIdFilter } from '@/utils/rbac.util';
 
 export const auditTrailService = {
   // ─── Get Commission Logs ───

@@ -25,7 +25,7 @@ export const adminAgentService = {
     if (superAdmin.role.slug !== UserRole.super_admin)
       throw new AppError(
         'Only super admin can change agent status',
-        StatusCodes.NOT_FOUND,
+        StatusCodes.FORBIDDEN,
       );
 
     const agent = await prisma.agent.findUnique({
