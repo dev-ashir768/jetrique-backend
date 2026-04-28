@@ -1,13 +1,10 @@
 import asyncHandler from 'express-async-handler';
 import { Response, Request } from 'express';
-import { adminAgentService } from './admin.agent.service';
 import { sendError, sendSuccess } from '@/utils/response.util';
 import { StatusCodes } from 'http-status-codes';
-import {
-  GetAgentsFormType,
-  UpdateAgentFinanceFormType,
-} from './admin.agent.schema';
 import { JWTAccessTokenType } from '@/types';
+import { adminAgentService } from './admin.agent.service';
+import { UpdateAgentFinanceFormType } from './admin.agent.schema';
 
 export const adminAgentController = {
   updateAgentStatus: asyncHandler(async (req: Request, res: Response) => {
@@ -24,33 +21,6 @@ export const adminAgentController = {
     );
 
     sendSuccess(res, {}, data.message, StatusCodes.OK);
-  }),
-
-  getAgents: asyncHandler(async (req: Request, res: Response) => {
-    const query = req.query as GetAgentsFormType;
-    const requestingUser = req.user as JWTAccessTokenType;
-
-    const data = await adminAgentService.getAgents(query, requestingUser);
-
-    sendSuccess(
-      res,
-      data.agents,
-      'Agents Fetched Successfully',
-      StatusCodes.OK,
-      data.meta,
-    );
-  }),
-
-  getAgentById: asyncHandler(async (req: Request, res: Response) => {
-    const agentId = Number(req.params.agentId);
-    const requestingUser = req.user as JWTAccessTokenType;
-
-    if (isNaN(agentId))
-      sendError(res, 'Invalid agent ID', StatusCodes.BAD_REQUEST);
-
-    const data = await adminAgentService.getAgentById(agentId, requestingUser);
-
-    sendSuccess(res, data, 'Agent Fetched Successfully', StatusCodes.OK);
   }),
 
   updateAgentFinance: asyncHandler(async (req: Request, res: Response) => {
