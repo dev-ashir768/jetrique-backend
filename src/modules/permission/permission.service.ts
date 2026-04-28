@@ -17,6 +17,7 @@ export const PermissionService = {
     const skip = (parseInt(page) - 1) * take;
 
     const permissionFilter: Prisma.PermissionWhereInput = {
+      deletedAt: null,
       isActive: true,
       parentId: null,
       ...(status && { type: status }),
@@ -36,7 +37,7 @@ export const PermissionService = {
           permission: {
             include: {
               children: {
-                where: { isActive: true },
+                where: { deletedAt: null, isActive: true },
                 orderBy: { createdAt: 'asc' },
               },
             },

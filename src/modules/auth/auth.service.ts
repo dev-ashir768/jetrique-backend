@@ -154,27 +154,28 @@ export const authService = {
     const user = await userService.getUserById(userId);
     if (!user) throw new AppError('User not found.', 404);
 
-    const rolePermissions = await prisma.rolePermission.findMany({
-      where: {
-        roleId: user.roleId,
-        permission: {
-          isActive: true,
-          deletedAt: null,
-        },
+    const where: Prisma.RolePermissionWhereInput = {
+      roleId: user.roleId,
+      permission: {
+        deletedAt: null,
+        isActive: true,
+        parentId: null,
       },
+    };
+
+    const rolePermissions = await prisma.rolePermission.findMany({
+      where,
       select: {
         permission: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            description: true,
-            icon: true,
-            parentId: true,
-            type: true,
+          include: {
+            children: {
+              where: { deletedAt: null, isActive: true },
+              orderBy: { createdAt: 'asc' },
+            },
           },
         },
       },
+      orderBy: { permission: { createdAt: 'asc' } },
     });
     if (!rolePermissions) {
       throw new AppError('Role permissions not found', 404);
