@@ -8,39 +8,44 @@ import { UserRole } from '@prisma/client';
 
 const router = Router();
 
-// ─── All routes: Super Admin and PSA only ───
-router.use(
-  authMiddleware.verifyAccessToken,
-  authMiddleware.authorize([UserRole.super_admin, UserRole.psa]),
-);
+// ─── Authorization Token Verification ───
+router.use(authMiddleware.verifyAccessToken);
 
 // ─── Get all Agents ───
 router.get(
   '/',
+  authMiddleware.authorize([UserRole.super_admin, UserRole.psa]),
   validate(agentSchema.getAgentsSchema, ValidationSource.QUERY),
   agentController.getAgents,
 );
 
 // ─── Get Agent by Id ───
-router.get('/:agentId', agentController.getAgentById);
+router.get(
+  '/:agentId',
+  authMiddleware.authorize([UserRole.super_admin, UserRole.psa]),
+  agentController.getAgentById,
+);
 
 // ─── Update Agent Status (Approve / Reject) ───
 router.patch(
   '/status/:agentId',
-  validate(agentSchema.updateAgentStatusSchema),
+  authMiddleware.authorize([UserRole.super_admin]),
+  validate(agentSchema.updateAgentStatusSchema, ValidationSource.PARAMS),
   agentController.updateAgentStatus,
 );
 
 // ─── Update Agent Finance ───
 router.patch(
   '/finance/:agentId',
-  validate(agentSchema.updateAgentFinanceSchema),
+  authMiddleware.authorize([UserRole.super_admin]),
+  validate(agentSchema.updateAgentFinanceSchema, ValidationSource.PARAMS),
   agentController.updateAgentFinance,
 );
 
 // ─── Create Sub Agent ───
 router.post(
   '/sub-agent',
+  authMiddleware.authorize([UserRole.psa]),
   validate(agentSchema.createSubAgent),
   agentController.createSubAgent,
 );
