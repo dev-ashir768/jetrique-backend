@@ -12,11 +12,22 @@ import { UserRole } from '@prisma/client';
 
 const router = Router();
 
-// ─── All routes: Super Admin only ───
 router.use(
   authMiddleware.verifyAccessToken,
-  authMiddleware.authorize([UserRole.super_admin]),
 );
+
+// ─── Get all Agents ───
+router.get(
+  '/',
+  validate(getAgentsSchema, ValidationSource.QUERY),
+  adminAgentController.getAgents,
+);
+
+// ─── Get Agent by Id ───
+router.get('/:agentId', adminAgentController.getAgentById);
+
+// ─── All routes: Super Admin only ───
+router.use(authMiddleware.authorize([UserRole.super_admin]));
 
 // ─── Update Agent Status (Approve / Reject) ───
 router.patch(
@@ -31,14 +42,5 @@ router.patch(
   validate(updateAgentFinanceSchema),
   adminAgentController.updateAgentFinance,
 );
-// ─── Get all Agents ───
-router.get(
-  '/',
-  validate(getAgentsSchema, ValidationSource.QUERY),
-  adminAgentController.getAgents,
-);
-
-// ─── Get Agent by Id ───
-router.get('/:agentId', adminAgentController.getAgentById);
 
 export default router;

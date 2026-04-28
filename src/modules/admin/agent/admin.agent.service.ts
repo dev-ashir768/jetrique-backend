@@ -8,8 +8,89 @@ import { AppError } from '@/middleware/error.middleware';
 import { userService } from '@/modules/user/user.service';
 import { StatusCodes } from 'http-status-codes';
 import { Prisma, UserRole } from '@prisma/client';
+import { getAgentIdFilter } from '@/utils/rbac.util';
+import { JWTAccessTokenType } from '@/types';
 
 export const adminAgentService = {
+  // ─── Get Agents ───
+  getAgents: async (
+    query: GetAgentsFormType,
+    requestingUser: JWTAccessTokenType,
+  ) => {
+    const { page = '1', limit = '10', search, status } = query;
+    const { agentId: id } = await getAgentIdFilter(requestingUser);
+    const { agentId: requestingAgentId } = requestingUser;
+
+    const take = parseInt(limit);
+    const skip = (parseInt(page) - 1) * take;
+
+    const where: Prisma.AgentWhereInput = {
+      deletedAt: null,
+      AND: [
+        { ...(id && { id }) },
+        { ...(requestingAgentId && { id: { not: requestingAgentId } }) },
+      ],
+      ...(status && { status }),
+      ...(search && {
+        OR: [
+          { fullName: { contains: search } },
+          { email: { contains: search } },
+          { companyName: { contains: search } },
+          { cnic: { contains: search } },
+        ],
+      }),
+    };
+
+    const [agents, total] = await prisma.$transaction([
+      prisma.agent.findMany({
+        where,
+        include: {
+          role: { select: { id: true, name: true, slug: true } },
+          psa: { select: { id: true, fullName: true, email: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take,
+        skip,
+      }),
+
+      prisma.agent.count({ where }),
+    ]);
+
+    return {
+      agents,
+      meta: {
+        total,
+        page: Number(page),
+        limit: Number(take),
+        totalPages: Math.ceil(total / take),
+      },
+    };
+  },
+
+  // ─── Get Agent by Id ───
+  getAgentById: async (agentId: number, requestingUser: JWTAccessTokenType) => {
+    const { agentId: psaId } = await getAgentIdFilter(requestingUser);
+
+    const agent = await prisma.agent.findUnique({
+      where: { id: agentId, deletedAt: null, ...(psaId && { psaId }) },
+      include: {
+        role: { select: { id: true, name: true, slug: true } },
+        psa: { select: { id: true, fullName: true, email: true } },
+        subAgents: {
+          select: { id: true, fullName: true, email: true, status: true },
+        },
+        agentStatusLogs: {
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
+      },
+    });
+
+    if (!agent) throw new AppError('Agent not found', StatusCodes.NOT_FOUND);
+
+    return agent;
+  },
+
   // ─── Update Agent Status ───
   updateAgentStatus: async (
     agentId: number,
@@ -125,10 +206,11 @@ export const adminAgentService = {
     payload: UpdateAgentFinanceFormType,
     agentId: number,
     superAdminId: number,
+    requestingUser: JWTAccessTokenType,
   ) => {
     const { commission, paymentType, reason } = payload;
 
-    const agent = await adminAgentService.getAgentById(agentId);
+    const agent = await adminAgentService.getAgentById(agentId, requestingUser);
 
     if (!agent) throw new AppError('Agent not found', StatusCodes.NOT_FOUND);
 
@@ -180,73 +262,5 @@ export const adminAgentService = {
     });
 
     return {};
-  },
-
-  // ─── Get Agents ───
-  getAgents: async (query: GetAgentsFormType) => {
-    const { page = '1', limit = '10', search, status } = query;
-
-    const take = parseInt(limit);
-    const skip = (parseInt(page) - 1) * take;
-
-    const where: Prisma.AgentWhereInput = {
-      deletedAt: null,
-      ...(status && { status }),
-      ...(search && {
-        OR: [
-          { fullName: { contains: search } },
-          { email: { contains: search } },
-          { companyName: { contains: search } },
-          { cnic: { contains: search } },
-        ],
-      }),
-    };
-
-    const [agents, total] = await prisma.$transaction([
-      prisma.agent.findMany({
-        where,
-        include: {
-          role: { select: { id: true, name: true, slug: true } },
-          psa: { select: { id: true, fullName: true, email: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-        take,
-        skip,
-      }),
-
-      prisma.agent.count({ where }),
-    ]);
-
-    return {
-      agents,
-      meta: {
-        total,
-        page: Number(page),
-        limit: Number(take),
-        totalPages: Math.ceil(total / take),
-      },
-    };
-  },
-
-  // ─── Get Agent by Id ───
-  getAgentById: async (agentId: number) => {
-    const agent = await prisma.agent.findUnique({
-      where: { id: agentId, deletedAt: null },
-      include: {
-        role: { select: { id: true, name: true, slug: true } },
-        psa: { select: { id: true, fullName: true, email: true } },
-        subAgents: {
-          select: { id: true, fullName: true, email: true, status: true },
-        },
-        agentStatusLogs: {
-          orderBy: { createdAt: 'desc' },
-          take: 10,
-        },
-      },
-    });
-
-    if (!agent) throw new AppError('Agent not found', StatusCodes.NOT_FOUND);
-
-    return agent;
   },
 };

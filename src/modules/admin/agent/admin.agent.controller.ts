@@ -7,6 +7,7 @@ import {
   GetAgentsFormType,
   UpdateAgentFinanceFormType,
 } from './admin.agent.schema';
+import { JWTAccessTokenType } from '@/types';
 
 export const adminAgentController = {
   updateAgentStatus: asyncHandler(async (req: Request, res: Response) => {
@@ -26,9 +27,10 @@ export const adminAgentController = {
   }),
 
   getAgents: asyncHandler(async (req: Request, res: Response) => {
-    const data = await adminAgentService.getAgents(
-      req.query as GetAgentsFormType,
-    );
+    const query = req.query as GetAgentsFormType;
+    const requestingUser = req.user as JWTAccessTokenType;
+
+    const data = await adminAgentService.getAgents(query, requestingUser);
 
     sendSuccess(
       res,
@@ -41,11 +43,12 @@ export const adminAgentController = {
 
   getAgentById: asyncHandler(async (req: Request, res: Response) => {
     const agentId = Number(req.params.agentId);
+    const requestingUser = req.user as JWTAccessTokenType;
 
     if (isNaN(agentId))
       sendError(res, 'Invalid agent ID', StatusCodes.BAD_REQUEST);
 
-    const data = await adminAgentService.getAgentById(agentId);
+    const data = await adminAgentService.getAgentById(agentId, requestingUser);
 
     sendSuccess(res, data, 'Agent Fetched Successfully', StatusCodes.OK);
   }),
@@ -53,6 +56,7 @@ export const adminAgentController = {
   updateAgentFinance: asyncHandler(async (req: Request, res: Response) => {
     const agentId = Number(req.params.agentId);
     const adminId = Number(req.user?.userId);
+    const requestingUser = req.user as JWTAccessTokenType;
 
     if (isNaN(agentId) || isNaN(adminId))
       sendError(res, 'Invalid agent or admin ID', StatusCodes.BAD_REQUEST);
@@ -61,6 +65,7 @@ export const adminAgentController = {
       req.body as UpdateAgentFinanceFormType,
       agentId,
       adminId,
+      requestingUser,
     );
 
     sendSuccess(
