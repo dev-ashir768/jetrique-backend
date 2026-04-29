@@ -15,26 +15,17 @@ export const agentSchema = {
       .optional(),
     search: z
       .string({
-        error: (issue) =>
-          issue?.input === undefined
-            ? 'Search is required'
-            : 'Search must be a string',
+        error: (issue) => (issue?.input === undefined ? 'Search is required' : 'Search must be a string'),
       })
       .optional(),
     page: z
       .string({
-        error: (issue) =>
-          issue?.input === undefined
-            ? 'Page is required'
-            : 'Page must be a string',
+        error: (issue) => (issue?.input === undefined ? 'Page is required' : 'Page must be a string'),
       })
       .optional(),
     limit: z
       .string({
-        error: (issue) =>
-          issue?.input === undefined
-            ? 'Limit is required'
-            : 'Limit must be a string',
+        error: (issue) => (issue?.input === undefined ? 'Limit is required' : 'Limit must be a string'),
       })
       .optional(),
   }),
@@ -43,10 +34,7 @@ export const agentSchema = {
     .object({
       commission: z
         .number({
-          error: (issue) =>
-            issue.input === undefined
-              ? 'Commission is required'
-              : 'Commission must be a number',
+          error: (issue) => (issue.input === undefined ? 'Commission is required' : 'Commission must be a number'),
         })
         .min(0, 'Commission cannot be negative')
         .max(100, 'Commission cannot exceed 100%')
@@ -56,9 +44,7 @@ export const agentSchema = {
           error: (issue) =>
             issue.input === undefined
               ? 'Payment Type is required'
-              : `Payment Type must be one of ${Object.values(PaymentType).join(
-                  ', ',
-                )}`,
+              : `Payment Type must be one of ${Object.values(PaymentType).join(', ')}`,
         })
         .optional(),
       status: z.enum(AgentStatus, {
@@ -69,10 +55,7 @@ export const agentSchema = {
       }),
       reason: z
         .string({
-          error: (issue) =>
-            issue.input === ''
-              ? 'Reason is required'
-              : 'Reason must be a string',
+          error: (issue) => (issue.input === '' ? 'Reason is required' : 'Reason must be a string'),
         })
         .min(10, 'Reason must be at least 10 characters')
         .max(500, 'Reason cannot exceed 500 characters')
@@ -119,10 +102,7 @@ export const agentSchema = {
   updateAgentFinanceSchema: z.object({
     commission: z
       .number({
-        error: (issue) =>
-          issue.input === undefined
-            ? 'Commission is required'
-            : 'Commission must be a number',
+        error: (issue) => (issue.input === undefined ? 'Commission is required' : 'Commission must be a number'),
       })
       .min(0, 'Commission cannot be negative')
       .max(100, 'Commission cannot exceed 100%')
@@ -132,15 +112,12 @@ export const agentSchema = {
         error: (issue) =>
           issue.input === undefined
             ? 'Payment Type is required'
-            : `Payment Type must be one of ${Object.values(PaymentType).join(
-                ', ',
-              )}`,
+            : `Payment Type must be one of ${Object.values(PaymentType).join(', ')}`,
       })
       .optional(),
     reason: z
       .string({
-        error: (issue) =>
-          issue.input === '' ? 'Reason is required' : 'Reason must be a string',
+        error: (issue) => (issue.input === '' ? 'Reason is required' : 'Reason must be a string'),
       })
       .min(10, 'Reason must be at least 10 characters')
       .max(500, 'Reason cannot exceed 500 characters'),
@@ -149,14 +126,12 @@ export const agentSchema = {
   createSubAgent: z.object({
     fullName: z
       .string({
-        error: (issue) =>
-          issue.input === '' ? 'Full name is required' : 'Invalid full name',
+        error: (issue) => (issue.input === '' ? 'Full name is required' : 'Invalid full name'),
       })
       .min(3, 'Full name must be at least 3 characters'),
     email: z
       .email({
-        error: (issue) =>
-          issue.input === '' ? 'Email is required' : 'Invalid email address',
+        error: (issue) => (issue.input === '' ? 'Email is required' : 'Invalid email address'),
       })
       .trim()
       .refine((val) => !REGEX.FORBIDDEN_CODE.test(val), {
@@ -179,18 +154,14 @@ export const agentSchema = {
       .max(15, 'CNIC cannot exceed 15 characters')
       .trim()
       .refine((val) => REGEX.CNIC.test(val), {
-        error:
-          'Invalid input: Format must be xxxxxxxxxxxxxx or xxxxx-xxxxxxx-x',
+        error: 'Invalid input: Format must be xxxxxxxxxxxxxx or xxxxx-xxxxxxx-x',
       })
       .refine((val) => !REGEX.FORBIDDEN_CODE.test(val), {
         error: 'Invalid input: Code-like content is not allowed',
       }),
     commission: z
       .number({
-        error: (issue) =>
-          issue.input === undefined
-            ? 'Commission is required'
-            : 'Commission must be a number',
+        error: (issue) => (issue.input === undefined ? 'Commission is required' : 'Commission must be a number'),
       })
       .min(0, 'Commission cannot be negative')
       .max(100, 'Commission cannot exceed 100%'),
@@ -198,18 +169,12 @@ export const agentSchema = {
       error: (issue) =>
         issue.input === undefined
           ? 'Payment Type is required'
-          : `Payment Type must be one of ${Object.values(PaymentType).join(
-              ', ',
-            )}`,
+          : `Payment Type must be one of ${Object.values(PaymentType).join(', ')}`,
     }),
   }),
 };
 
 export type GetAgentsFormType = z.infer<typeof agentSchema.getAgentsSchema>;
-export type UpdateAgentStatusFormType = z.infer<
-  typeof agentSchema.updateAgentStatusSchema
->;
-export type UpdateAgentFinanceFormType = z.infer<
-  typeof agentSchema.updateAgentFinanceSchema
->;
+export type UpdateAgentStatusFormType = z.infer<typeof agentSchema.updateAgentStatusSchema>;
+export type UpdateAgentFinanceFormType = z.infer<typeof agentSchema.updateAgentFinanceSchema>;
 export type CreateSubAgentFormType = z.infer<typeof agentSchema.createSubAgent>;

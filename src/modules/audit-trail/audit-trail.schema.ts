@@ -6,36 +6,21 @@ export const getCommissionLogsSchema = z
   .object({
     search: z
       .string({
-        error: (issue) =>
-          issue?.input === undefined
-            ? 'Search is required'
-            : 'Search must be a string',
+        error: (issue) => (issue?.input === undefined ? 'Search is required' : 'Search must be a string'),
       })
       .optional(),
     page: z
       .string({
-        error: (issue) =>
-          issue.input === undefined
-            ? 'Page is required'
-            : 'Page must be a string',
+        error: (issue) => (issue.input === undefined ? 'Page is required' : 'Page must be a string'),
       })
       .optional(),
     limit: z
       .string({
-        error: (issue) =>
-          issue.input === undefined
-            ? 'Limit is required'
-            : 'Limit must be a string',
+        error: (issue) => (issue.input === undefined ? 'Limit is required' : 'Limit must be a string'),
       })
       .optional(),
-    startDate: z.preprocess(
-      (arg) => (typeof arg === 'string' ? new Date(arg) : arg),
-      z.date().optional(),
-    ),
-    endDate: z.preprocess(
-      (arg) => (typeof arg === 'string' ? new Date(arg) : arg),
-      z.date().optional(),
-    ),
+    startDate: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date().optional()),
+    endDate: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date().optional()),
   })
   .superRefine((data, ctx) => {
     if (data.startDate && data.endDate) {
@@ -62,36 +47,21 @@ export const getPaymentTypeLogsSchema = z
       .optional(),
     search: z
       .string({
-        error: (issue) =>
-          issue?.input === undefined
-            ? 'Search is required'
-            : 'Search must be a string',
+        error: (issue) => (issue?.input === undefined ? 'Search is required' : 'Search must be a string'),
       })
       .optional(),
     page: z
       .string({
-        error: (issue) =>
-          issue.input === undefined
-            ? 'Page is required'
-            : 'Page must be a string',
+        error: (issue) => (issue.input === undefined ? 'Page is required' : 'Page must be a string'),
       })
       .optional(),
     limit: z
       .string({
-        error: (issue) =>
-          issue.input === undefined
-            ? 'Limit is required'
-            : 'Limit must be a string',
+        error: (issue) => (issue.input === undefined ? 'Limit is required' : 'Limit must be a string'),
       })
       .optional(),
-    startDate: z.preprocess(
-      (arg) => (typeof arg === 'string' ? new Date(arg) : arg),
-      z.date().optional(),
-    ),
-    endDate: z.preprocess(
-      (arg) => (typeof arg === 'string' ? new Date(arg) : arg),
-      z.date().optional(),
-    ),
+    startDate: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date().optional()),
+    endDate: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date().optional()),
   })
   .superRefine((data, ctx) => {
     if (data.startDate && data.endDate) {
@@ -118,28 +88,16 @@ export const getAgentStatusLogsSchema = z
       .optional(),
     page: z
       .string({
-        error: (issue) =>
-          issue.input === undefined
-            ? 'Page is required'
-            : 'Page must be a string',
+        error: (issue) => (issue.input === undefined ? 'Page is required' : 'Page must be a string'),
       })
       .optional(),
     limit: z
       .string({
-        error: (issue) =>
-          issue.input === undefined
-            ? 'Limit is required'
-            : 'Limit must be a string',
+        error: (issue) => (issue.input === undefined ? 'Limit is required' : 'Limit must be a string'),
       })
       .optional(),
-    startDate: z.preprocess(
-      (arg) => (typeof arg === 'string' ? new Date(arg) : arg),
-      z.date().optional(),
-    ),
-    endDate: z.preprocess(
-      (arg) => (typeof arg === 'string' ? new Date(arg) : arg),
-      z.date().optional(),
-    ),
+    startDate: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date().optional()),
+    endDate: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date().optional()),
   })
   .superRefine((data, ctx) => {
     if (data.startDate && data.endDate) {
@@ -154,9 +112,5 @@ export const getAgentStatusLogsSchema = z
   });
 
 export type GetCommissionLogsFormType = z.infer<typeof getCommissionLogsSchema>;
-export type GetPaymentTypeLogsFormType = z.infer<
-  typeof getPaymentTypeLogsSchema
->;
-export type GetAgentStatusLogsFormType = z.infer<
-  typeof getAgentStatusLogsSchema
->;
+export type GetPaymentTypeLogsFormType = z.infer<typeof getPaymentTypeLogsSchema>;
+export type GetAgentStatusLogsFormType = z.infer<typeof getAgentStatusLogsSchema>;

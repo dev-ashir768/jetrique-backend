@@ -20,11 +20,7 @@ router.get(
 );
 
 // ─── Get Agent by Id ───
-router.get(
-  '/:agentId',
-  authMiddleware.authorize([UserRole.super_admin, UserRole.psa]),
-  agentController.getAgentById,
-);
+router.get('/:agentId', authMiddleware.authorize([UserRole.super_admin, UserRole.psa]), agentController.getAgentById);
 
 // ─── Update Agent Status (Approve / Reject) ───
 router.patch(

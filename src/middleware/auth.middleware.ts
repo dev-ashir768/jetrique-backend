@@ -24,19 +24,17 @@ export const authMiddleware = {
     }
   },
 
-  authorize:
-    (allowedRoles: string[]) =>
-    (req: Request, res: Response, next: NextFunction) => {
-      const userRole = req.user?.roleSlug;
+  authorize: (allowedRoles: string[]) => (req: Request, res: Response, next: NextFunction) => {
+    const userRole = req.user?.roleSlug;
 
-      if (!userRole) {
-        return sendError(res, 'Unauthorized', 401);
-      }
+    if (!userRole) {
+      return sendError(res, 'Unauthorized', 401);
+    }
 
-      if (!allowedRoles.includes(userRole)) {
-        return sendError(res, 'Forbidden — You do not have access', 403);
-      }
+    if (!allowedRoles.includes(userRole)) {
+      return sendError(res, 'Forbidden — You do not have access', 403);
+    }
 
-      next();
-    },
+    next();
+  },
 };

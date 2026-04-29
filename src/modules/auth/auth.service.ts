@@ -7,22 +7,17 @@ import {
   RegisterFormType,
 } from './auth.schema';
 import { comparePassword, hashPassword } from '@/utils/password.util';
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  verifyRefreshToken,
-} from '@/utils/jwt.util';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '@/utils/jwt.util';
 import { userService } from '../user/user.service';
 import { roleService } from '../role/role.service';
-import { JWTAccessTokenType, JWTRefreshTokenType } from '@/types';
+import { JWTAccessTokenType, JWTRefreshTokenType, LoggedInUser } from '@/types';
 import { AppError } from '@/middleware/error.middleware';
 import { logger } from '@/config/logger.config';
 import { Prisma } from '@prisma/client';
 
 export const authService = {
   registerAgent: async (payload: RegisterFormType) => {
-    const { roleId, cnic, email, fullName, password, companyName, phone } =
-      payload;
+    const { roleId, cnic, email, fullName, password, companyName, phone } = payload;
 
     const existingUser = await userService.getUserByEmail(email);
     const role = await roleService.getRoleById(roleId);
@@ -37,33 +32,31 @@ export const authService = {
 
     const hashedPassword = await hashPassword(password);
 
-    const result = await prisma.$transaction(
-      async (tx: Prisma.TransactionClient) => {
-        const agent = await tx.agent.create({
-          data: {
-            fullName,
-            email,
-            companyName,
-            phone,
-            cnic,
-            status: 'PENDING',
-            roleId: role.id,
-          },
-        });
-        const user = await tx.user.create({
-          data: {
-            fullName,
-            email,
-            phone,
-            password: hashedPassword,
-            status: 'PENDING',
-            roleId: role.id,
-            agentId: agent.id,
-          },
-        });
-        return { agent, user };
-      },
-    );
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const agent = await tx.agent.create({
+        data: {
+          fullName,
+          email,
+          companyName,
+          phone,
+          cnic,
+          status: 'PENDING',
+          roleId: role.id,
+        },
+      });
+      const user = await tx.user.create({
+        data: {
+          fullName,
+          email,
+          phone,
+          password: hashedPassword,
+          status: 'PENDING',
+          roleId: role.id,
+          agentId: agent.id,
+        },
+      });
+      return { agent, user };
+    });
 
     return {
       agentId: result.agent.id,
@@ -82,20 +75,14 @@ export const authService = {
     if (!isPasswordMatch) throw new AppError('Invalid email or password', 400);
 
     // Check status
-    if (user.status === 'PENDING')
-      throw new AppError('Your account is pending admin approval', 403);
-    if (user.status === 'REJECTED')
-      throw new AppError(
-        'Your account has been rejected. Contact support',
-        403,
-      );
+    if (user.status === 'PENDING') throw new AppError('Your account is pending admin approval', 403);
+    if (user.status === 'REJECTED') throw new AppError('Your account has been rejected. Contact support', 403);
     // if (user.status === "SUSPENDED")
     //   throw new AppError(
     //     "Your account has been suspended. Contact support",
     //     403,
     //   );
-    if (!user.isActive)
-      throw new AppError('Your account is inactive. Contact support', 403);
+    if (!user.isActive) throw new AppError('Your account is inactive. Contact support', 403);
 
     // Generate tokens
     const accesssTokenPayload: JWTAccessTokenType = {
@@ -148,8 +135,8 @@ export const authService = {
     };
   },
 
-  getMe: async (requestingUser: JWTAccessTokenType) => {
-    const { userId } = requestingUser;
+  getMe: async (loggedInUser: LoggedInUser) => {
+    const { userId } = loggedInUser;
 
     const user = await userService.getUserById(userId);
     if (!user) throw new AppError('User not found.', 404);
@@ -234,21 +221,14 @@ export const authService = {
     });
 
     if (!storedToken) throw new AppError('Refresh token not found', 401);
-    if (storedToken.isRevoked)
-      throw new AppError('Refresh token has been revoked', 401);
-    if (storedToken.expiresAt < new Date())
-      throw new AppError('Refresh token has expired', 401);
-    if (!storedToken.user.isActive)
-      throw new AppError('Account is inactive', 403);
+    if (storedToken.isRevoked) throw new AppError('Refresh token has been revoked', 401);
+    if (storedToken.expiresAt < new Date()) throw new AppError('Refresh token has expired', 401);
+    if (!storedToken.user.isActive) throw new AppError('Account is inactive', 403);
 
     // Check user status
-    if (storedToken.user.status === 'PENDING')
-      throw new AppError('Your account is pending admin approval', 403);
+    if (storedToken.user.status === 'PENDING') throw new AppError('Your account is pending admin approval', 403);
     if (storedToken.user.status === 'REJECTED')
-      throw new AppError(
-        'Your account has been rejected. Contact support',
-        403,
-      );
+      throw new AppError('Your account has been rejected. Contact support', 403);
     // if (storedToken.user.status === "SUSPENDED")
     //   throw new AppError(
     //     "Your account has been suspended. Contact support",
@@ -283,9 +263,7 @@ export const authService = {
     return null;
   },
 
-  changePassword: async (
-    payload: ChangePasswordFormType & { userId: number | undefined },
-  ) => {
+  changePassword: async (payload: ChangePasswordFormType & { userId: number | undefined }) => {
     const { newPassword, oldPassword, userId } = payload;
 
     // Find user

@@ -2,11 +2,7 @@ import { Router } from 'express';
 import { auditTrailController } from './audit-trail.controller';
 import { authMiddleware } from '@/middleware/auth.middleware';
 import { validate } from '@/middleware/validate.middleware';
-import {
-  getAgentStatusLogsSchema,
-  getCommissionLogsSchema,
-  getPaymentTypeLogsSchema,
-} from './audit-trail.schema';
+import { getAgentStatusLogsSchema, getCommissionLogsSchema, getPaymentTypeLogsSchema } from './audit-trail.schema';
 import { ValidationSource } from '@/types';
 
 const router = Router();

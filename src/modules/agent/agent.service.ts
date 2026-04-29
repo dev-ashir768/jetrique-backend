@@ -3,7 +3,7 @@ import { AppError } from '@/middleware/error.middleware';
 import { StatusCodes } from 'http-status-codes';
 import { AgentStatus, Prisma, UserRole } from '@prisma/client';
 import { getAgentIdFilter } from '@/utils/rbac.util';
-import { JWTAccessTokenType } from '@/types';
+import { LoggedInUser } from '@/types';
 import {
   CreateSubAgentFormType,
   GetAgentsFormType,
@@ -15,23 +15,17 @@ import { generatePassword, hashPassword } from '@/utils/password.util';
 
 export const agentService = {
   // ─── Get Agents ───
-  getAgents: async (
-    query: GetAgentsFormType,
-    requestingUser: JWTAccessTokenType,
-  ) => {
+  getAgents: async (query: GetAgentsFormType, loggedInUser: LoggedInUser) => {
     const { page = '1', limit = '10', search, status } = query;
-    const { agentId: id } = await getAgentIdFilter(requestingUser);
-    const { agentId: requestingAgentId } = requestingUser;
+    const { agentId: id } = await getAgentIdFilter(loggedInUser);
+    const { agentId: requestingAgentId } = loggedInUser;
 
     const take = parseInt(limit);
     const skip = (parseInt(page) - 1) * take;
 
     const where: Prisma.AgentWhereInput = {
       deletedAt: null,
-      AND: [
-        { ...(id && { id }) },
-        { ...(requestingAgentId && { id: { not: requestingAgentId } }) },
-      ],
+      AND: [{ ...(id && { id }) }, { ...(requestingAgentId && { id: { not: requestingAgentId } }) }],
       ...(status && { status }),
       ...(search && {
         OR: [
@@ -70,8 +64,8 @@ export const agentService = {
   },
 
   // ─── Get Agent by Id ───
-  getAgentById: async (agentId: number, requestingUser: JWTAccessTokenType) => {
-    const { agentId: psaId } = await getAgentIdFilter(requestingUser);
+  getAgentById: async (agentId: number, loggedInUser: LoggedInUser) => {
+    const { agentId: psaId } = await getAgentIdFilter(loggedInUser);
 
     const agent = await prisma.agent.findUnique({
       where: { id: agentId, deletedAt: null, ...(psaId && { psaId }) },
@@ -94,22 +88,14 @@ export const agentService = {
   },
 
   // ─── Update Agent Status ───
-  updateAgentStatus: async (
-    agentId: number,
-    payload: UpdateAgentStatusFormType,
-    superAdminId: number,
-  ) => {
+  updateAgentStatus: async (agentId: number, payload: UpdateAgentStatusFormType, superAdminId: number) => {
     const { status, commission, reason, paymentType } = payload;
 
     const superAdmin = await userService.getUserById(superAdminId);
 
-    if (!superAdmin)
-      throw new AppError('Super Admin not found', StatusCodes.NOT_FOUND);
+    if (!superAdmin) throw new AppError('Super Admin not found', StatusCodes.NOT_FOUND);
     if (superAdmin.role.slug !== UserRole.super_admin)
-      throw new AppError(
-        'Only super admin can change agent status',
-        StatusCodes.FORBIDDEN,
-      );
+      throw new AppError('Only super admin can change agent status', StatusCodes.FORBIDDEN);
 
     const agent = await prisma.agent.findUnique({
       where: { id: agentId, deletedAt: null, isActive: true },
@@ -120,16 +106,10 @@ export const agentService = {
 
     //  Check status
     if (agent.status === status) {
-      throw new AppError(
-        `Agent is already ${status.toLowerCase()}`,
-        StatusCodes.BAD_REQUEST,
-      );
+      throw new AppError(`Agent is already ${status.toLowerCase()}`, StatusCodes.BAD_REQUEST);
     }
     if (agent.status === 'APPROVED' && status === 'REJECTED') {
-      throw new AppError(
-        'Approved agent cannot be rejected.',
-        StatusCodes.BAD_REQUEST,
-      );
+      throw new AppError('Approved agent cannot be rejected.', StatusCodes.BAD_REQUEST);
     }
 
     await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -208,26 +188,20 @@ export const agentService = {
     payload: UpdateAgentFinanceFormType,
     agentId: number,
     superAdminId: number,
-    requestingUser: JWTAccessTokenType,
+    loggedInUser: LoggedInUser,
   ) => {
     const { commission, paymentType, reason } = payload;
 
-    const agent = await agentService.getAgentById(agentId, requestingUser);
+    const agent = await agentService.getAgentById(agentId, loggedInUser);
 
     if (!agent) throw new AppError('Agent not found', StatusCodes.NOT_FOUND);
 
     if (agent.status !== 'APPROVED') {
-      throw new AppError(
-        'Only approved agents can be updated',
-        StatusCodes.BAD_REQUEST,
-      );
+      throw new AppError('Only approved agents can be updated', StatusCodes.BAD_REQUEST);
     }
 
     if (agent.commission === commission && agent.paymentType === paymentType)
-      throw new AppError(
-        'No changes in agent finance',
-        StatusCodes.BAD_REQUEST,
-      );
+      throw new AppError('No changes in agent finance', StatusCodes.BAD_REQUEST);
 
     await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.agent.update({
@@ -267,54 +241,37 @@ export const agentService = {
   },
 
   // ─── Create Sub Agent ───
-  createSubAgent: async (
-    payload: CreateSubAgentFormType,
-    requestingUser: JWTAccessTokenType,
-  ) => {
-    const {
-      cnic,
-      email,
-      fullName,
-      companyName,
-      phone,
-      commission,
-      paymentType,
-    } = payload;
-    const { userId } = requestingUser;
+  createSubAgent: async (payload: CreateSubAgentFormType, loggedInUser: LoggedInUser) => {
+    const { cnic, email, fullName, companyName, phone, commission, paymentType } = payload;
+    const { userId } = loggedInUser;
 
     const psaUser = await prisma.user.findUnique({
       where: { id: userId, deletedAt: null },
       select: { agentId: true },
     });
 
-    if (!psaUser?.agentId)
-      throw new AppError('PSA not found', StatusCodes.NOT_FOUND);
+    if (!psaUser?.agentId) throw new AppError('PSA not found', StatusCodes.NOT_FOUND);
 
     const psaAgent = await prisma.agent.findUnique({
       where: { id: psaUser.agentId, deletedAt: null },
       include: { role: true },
     });
 
-    if (!psaAgent)
-      throw new AppError('PSA agent not found', StatusCodes.NOT_FOUND);
-    if (psaAgent.status !== AgentStatus.APPROVED)
-      throw new AppError('PSA is not approved', StatusCodes.NOT_FOUND);
+    if (!psaAgent) throw new AppError('PSA agent not found', StatusCodes.NOT_FOUND);
+    if (psaAgent.status !== AgentStatus.APPROVED) throw new AppError('PSA is not approved', StatusCodes.NOT_FOUND);
 
     // ─── Check Email ───
     const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser)
-      throw new AppError('Email already registered', StatusCodes.FORBIDDEN);
+    if (existingUser) throw new AppError('Email already registered', StatusCodes.FORBIDDEN);
 
     const existingAgent = await prisma.agent.findUnique({ where: { email } });
-    if (existingAgent)
-      throw new AppError('Email already registered', StatusCodes.FORBIDDEN);
+    if (existingAgent) throw new AppError('Email already registered', StatusCodes.FORBIDDEN);
 
     // ─── Get Sub Agent Role ───
     const subAgentRole = await prisma.role.findFirst({
       where: { slug: UserRole.sub_agent },
     });
-    if (!subAgentRole)
-      throw new AppError('Sub agent role not found', StatusCodes.NOT_FOUND);
+    if (!subAgentRole) throw new AppError('Sub agent role not found', StatusCodes.NOT_FOUND);
 
     // ─── Generate Temp Password ───
     const tempPassword = generatePassword();

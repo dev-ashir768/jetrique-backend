@@ -7,12 +7,7 @@ import { JWTAccessTokenType } from '@/types';
 export const authController = {
   registerAgent: asyncHandler(async (req: Request, res: Response) => {
     const data = await authService.registerAgent(req.body);
-    sendSuccess(
-      res,
-      data,
-      'Registration submitted. Awaiting super admin approval.',
-      201,
-    );
+    sendSuccess(res, data, 'Registration submitted. Awaiting super admin approval.', 201);
   }),
 
   login: asyncHandler(async (req: Request, res: Response) => {
@@ -21,14 +16,9 @@ export const authController = {
   }),
 
   getMe: asyncHandler(async (req: Request, res: Response) => {
-    const requestingUser = {
-      userId: req.user?.userId,
-      roleSlug: req.user?.roleSlug,
-      roleId: req.user?.roleId,
-      agentId: req.user?.agentId,
-    } as JWTAccessTokenType;
+    const loggedInUser = req.user as JWTAccessTokenType;
 
-    const data = await authService.getMe(requestingUser);
+    const data = await authService.getMe(loggedInUser);
 
     sendSuccess(res, data, 'User fetched successfully');
   }),
@@ -44,11 +34,7 @@ export const authController = {
       oldPassword,
       userId,
     });
-    sendSuccess(
-      res,
-      data,
-      'Password changed successfully. Please login again.',
-    );
+    sendSuccess(res, data, 'Password changed successfully. Please login again.');
   }),
 
   refreshAccessToken: asyncHandler(async (req: Request, res: Response) => {

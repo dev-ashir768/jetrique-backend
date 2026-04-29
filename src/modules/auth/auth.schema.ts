@@ -5,14 +5,12 @@ import { REGEX } from '@/utils/constants.util';
 export const registerSchema = z.object({
   fullName: z
     .string({
-      error: (issue) =>
-        issue.input === '' ? 'Full name is required' : 'Invalid full name',
+      error: (issue) => (issue.input === '' ? 'Full name is required' : 'Invalid full name'),
     })
     .min(3, 'Full name must be at least 3 characters'),
   email: z
     .email({
-      error: (issue) =>
-        issue.input === '' ? 'Email is required' : 'Invalid email address',
+      error: (issue) => (issue.input === '' ? 'Email is required' : 'Invalid email address'),
     })
     .trim()
     .refine((val) => !REGEX.FORBIDDEN_CODE.test(val), {
@@ -21,10 +19,7 @@ export const registerSchema = z.object({
   password: z
     .string()
     .min(8, {
-      error: (issue) =>
-        issue.input === ''
-          ? 'Password is required'
-          : 'Password must be at least 8 characters long',
+      error: (issue) => (issue.input === '' ? 'Password is required' : 'Password must be at least 8 characters long'),
     })
     .trim()
     .refine((val) => !REGEX.FORBIDDEN_CODE.test(val), {
@@ -59,8 +54,7 @@ export const registerSchema = z.object({
 export const loginSchema = z.object({
   email: z
     .email({
-      error: (issue) =>
-        issue.input === '' ? 'Email is required' : 'Invalid email address',
+      error: (issue) => (issue.input === '' ? 'Email is required' : 'Invalid email address'),
     })
     .trim()
     .refine((val) => !REGEX.FORBIDDEN_CODE.test(val), {
@@ -69,10 +63,7 @@ export const loginSchema = z.object({
   password: z
     .string()
     .min(8, {
-      error: (issue) =>
-        issue.input === ''
-          ? 'Password is required'
-          : 'Password must be at least 8 characters long',
+      error: (issue) => (issue.input === '' ? 'Password is required' : 'Password must be at least 8 characters long'),
     })
     .trim()
     .refine((val) => !REGEX.FORBIDDEN_CODE.test(val), {
@@ -84,8 +75,7 @@ export const loginSchema = z.object({
 export const forgotPasswordSchema = z.object({
   email: z
     .email({
-      error: (issue) =>
-        issue.input === '' ? 'Email is required' : 'Invalid email address',
+      error: (issue) => (issue.input === '' ? 'Email is required' : 'Invalid email address'),
     })
     .trim()
     .refine((val) => !REGEX.FORBIDDEN_CODE.test(val), {
@@ -99,10 +89,7 @@ export const resetPasswordSchema = z.object({
   password: z
     .string()
     .min(8, {
-      error: (issue) =>
-        issue.input === ''
-          ? 'Password is required'
-          : 'Password must be at least 8 characters long',
+      error: (issue) => (issue.input === '' ? 'Password is required' : 'Password must be at least 8 characters long'),
     })
     .trim()
     .refine((val) => !REGEX.FORBIDDEN_CODE.test(val), {
@@ -123,9 +110,7 @@ export const changePasswordSchema = z.object({
     .string()
     .min(8, {
       error: (issue) =>
-        issue.input === ''
-          ? 'New Password is required'
-          : 'New Password must be at least 8 characters long',
+        issue.input === '' ? 'New Password is required' : 'New Password must be at least 8 characters long',
     })
     .trim()
     .refine((val) => !REGEX.FORBIDDEN_CODE.test(val), {
@@ -149,7 +134,5 @@ export type LoginFormType = z.infer<typeof loginSchema>;
 export type ForgotPasswordFormType = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordFormType = z.infer<typeof resetPasswordSchema>;
 export type ChangePasswordFormType = z.infer<typeof changePasswordSchema>;
-export type RefreshAccessTokenFormType = z.infer<
-  typeof refreshAccessTokenSchema
->;
+export type RefreshAccessTokenFormType = z.infer<typeof refreshAccessTokenSchema>;
 export type LogoutFormType = z.infer<typeof logoutSchema>;

@@ -10,16 +10,10 @@ export const PermissionController = {
   // ─── Get Permissions ───
   getPermissions: asyncHandler(async (req: Request, res: Response) => {
     const query = req.query as GetPermissionsFormType;
-    const requestingUser = req.user as JWTAccessTokenType;
+    const loggedInUser = req.user as JWTAccessTokenType;
 
-    const data = await PermissionService.getPermissions(query, requestingUser);
+    const data = await PermissionService.getPermissions(query, loggedInUser);
 
-    sendSuccess(
-      res,
-      data.permission,
-      'Permissions fetched successfully',
-      StatusCodes.OK,
-      data.meta,
-    );
+    sendSuccess(res, data.permission, 'Permissions fetched successfully', StatusCodes.OK, data.meta);
   }),
 };

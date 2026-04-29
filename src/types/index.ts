@@ -21,3 +21,5 @@ export interface Meta {
   limit: number;
   totalPages: number;
 }
+
+export type LoggedInUser = JWTAccessTokenType;

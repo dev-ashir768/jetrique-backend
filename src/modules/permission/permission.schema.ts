@@ -15,28 +15,16 @@ export const permissionSchema = {
         .optional(),
       page: z
         .string({
-          error: (issue) =>
-            issue.input === undefined
-              ? 'Page is required'
-              : 'Page must be a string',
+          error: (issue) => (issue.input === undefined ? 'Page is required' : 'Page must be a string'),
         })
         .optional(),
       limit: z
         .string({
-          error: (issue) =>
-            issue.input === undefined
-              ? 'Limit is required'
-              : 'Limit must be a string',
+          error: (issue) => (issue.input === undefined ? 'Limit is required' : 'Limit must be a string'),
         })
         .optional(),
-      startDate: z.preprocess(
-        (arg) => (typeof arg === 'string' ? new Date(arg) : arg),
-        z.date().optional(),
-      ),
-      endDate: z.preprocess(
-        (arg) => (typeof arg === 'string' ? new Date(arg) : arg),
-        z.date().optional(),
-      ),
+      startDate: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date().optional()),
+      endDate: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date().optional()),
     })
     .superRefine((data, ctx) => {
       if (data.startDate && data.endDate) {
@@ -51,6 +39,4 @@ export const permissionSchema = {
     }),
 };
 
-export type GetPermissionsFormType = z.infer<
-  typeof permissionSchema.getPermissions
->;
+export type GetPermissionsFormType = z.infer<typeof permissionSchema.getPermissions>;

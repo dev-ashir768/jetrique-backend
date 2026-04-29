@@ -1,17 +1,14 @@
 import { Prisma } from '@prisma/client';
 import { GetPermissionsFormType } from './permission.schema';
 import { endOfDay, startOfDay } from 'date-fns';
-import { JWTAccessTokenType } from '@/types';
+import { LoggedInUser } from '@/types';
 import { prisma } from '@/config/db.config';
 
 export const PermissionService = {
   // ─── Get Permissions ───
-  getPermissions: async (
-    query: GetPermissionsFormType,
-    requestingUser: JWTAccessTokenType,
-  ) => {
+  getPermissions: async (query: GetPermissionsFormType, loggedInUser: LoggedInUser) => {
     const { endDate, limit = '10', page = '1', startDate, status } = query;
-    const { roleId } = requestingUser;
+    const { roleId } = loggedInUser;
 
     const take = parseInt(limit);
     const skip = (parseInt(page) - 1) * take;

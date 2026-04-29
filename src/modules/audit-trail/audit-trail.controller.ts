@@ -14,62 +14,35 @@ export const auditTrailController = {
   // ─── Get Commission Logs ───
   getCommissionLogs: asyncHandler(async (req: Request, res: Response) => {
     const query = req.query as GetCommissionLogsFormType;
-    const requestingUser = req.user as JWTAccessTokenType;
+    const loggedInUser = req.user as JWTAccessTokenType;
 
-    const data = await auditTrailService.getCommissionLogs(
-      query,
-      requestingUser,
-    );
-    sendSuccess(
-      res,
-      data.commissionLogs,
-      'Commission Logs Fetched Successfully',
-      StatusCodes.OK,
-      data.meta,
-    );
+    const data = await auditTrailService.getCommissionLogs(query, loggedInUser);
+    sendSuccess(res, data.commissionLogs, 'Commission Logs Fetched Successfully', StatusCodes.OK, data.meta);
   }),
 
   // ─── Get Payment Type Logs ───
   getPaymentTypeLogs: asyncHandler(async (req: Request, res: Response) => {
-    const requestingUser = {
+    const loggedInUser = {
       userId: req.user?.userId,
       roleSlug: req.user?.roleSlug,
       roleId: req.user?.roleId,
       agentId: req.user?.agentId,
     } as JWTAccessTokenType;
 
-    const data = await auditTrailService.getPaymentTypeLogs(
-      req.query as GetPaymentTypeLogsFormType,
-      requestingUser,
-    );
-    sendSuccess(
-      res,
-      data.paymentTypeLogs,
-      'Payment Type Logs Fetched Successfully',
-      StatusCodes.OK,
-      data.meta,
-    );
+    const data = await auditTrailService.getPaymentTypeLogs(req.query as GetPaymentTypeLogsFormType, loggedInUser);
+    sendSuccess(res, data.paymentTypeLogs, 'Payment Type Logs Fetched Successfully', StatusCodes.OK, data.meta);
   }),
 
   // ─── Get Agent Status Logs ───
   getAgentStatusLogs: asyncHandler(async (req: Request, res: Response) => {
-    const requestingUser = {
+    const loggedInUser = {
       userId: req.user?.userId,
       roleSlug: req.user?.roleSlug,
       roleId: req.user?.roleId,
       agentId: req.user?.agentId,
     } as JWTAccessTokenType;
 
-    const data = await auditTrailService.getAgentStatusLogs(
-      req.query as GetAgentStatusLogsFormType,
-      requestingUser,
-    );
-    sendSuccess(
-      res,
-      data.agentStatusLogs,
-      'Agent Status Logs Fetched Successfully',
-      StatusCodes.OK,
-      data.meta,
-    );
+    const data = await auditTrailService.getAgentStatusLogs(req.query as GetAgentStatusLogsFormType, loggedInUser);
+    sendSuccess(res, data.agentStatusLogs, 'Agent Status Logs Fetched Successfully', StatusCodes.OK, data.meta);
   }),
 };

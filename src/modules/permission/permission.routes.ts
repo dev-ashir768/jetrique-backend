@@ -11,10 +11,6 @@ const router = Router();
 router.use(authMiddleware.verifyAccessToken);
 
 // Permission Routes
-router.get(
-  '/',
-  validate(permissionSchema.getPermissions, ValidationSource.QUERY),
-  PermissionController.getPermissions,
-);
+router.get('/', validate(permissionSchema.getPermissions, ValidationSource.QUERY), PermissionController.getPermissions);
 
 export default router;
