@@ -167,7 +167,7 @@ export const authService = {
       },
       orderBy: { permission: { createdAt: 'asc' } },
     });
-    
+
     if (!rolePermissions) {
       throw new AppError('Role permissions not found', 404);
     }

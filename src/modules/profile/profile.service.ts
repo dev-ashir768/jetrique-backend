@@ -3,7 +3,6 @@ import { UpdateProfileFormType } from './profile.schema';
 import { prisma } from '@/config/db.config';
 import { AppError } from '@/middleware/error.middleware';
 import { StatusCodes } from 'http-status-codes';
-import { tr } from 'zod/v4/locales';
 import { Prisma } from '@prisma/client';
 
 export const profileService = {
