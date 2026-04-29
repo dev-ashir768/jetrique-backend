@@ -16,6 +16,7 @@ import { logger } from '@/config/logger.config';
 import { Prisma } from '@prisma/client';
 
 export const authService = {
+  // ─── Register Agent ───
   registerAgent: async (payload: RegisterFormType) => {
     const { roleId, cnic, email, fullName, password, companyName, phone } = payload;
 
@@ -63,6 +64,7 @@ export const authService = {
     };
   },
 
+  // ─── Login User ───
   login: async (payload: LoginFormType) => {
     const { email, password } = payload;
 
@@ -135,6 +137,7 @@ export const authService = {
     };
   },
 
+  // ─── Get Current User ───
   getMe: async (loggedInUser: LoggedInUser) => {
     const { userId } = loggedInUser;
 
@@ -164,6 +167,7 @@ export const authService = {
       },
       orderBy: { permission: { createdAt: 'asc' } },
     });
+    
     if (!rolePermissions) {
       throw new AppError('Role permissions not found', 404);
     }
@@ -203,6 +207,7 @@ export const authService = {
     };
   },
 
+  // ─── Refresh Access Token ───
   refreshAccessToken: async (payload: RefreshAccessTokenFormType) => {
     const { refreshToken } = payload;
     let decoded: JWTRefreshTokenType;
@@ -249,6 +254,7 @@ export const authService = {
     };
   },
 
+  // ─── Logout User ───
   logout: async (payload: LogoutFormType) => {
     const { refreshToken } = payload;
     const result = await prisma.refreshToken.updateMany({
@@ -263,6 +269,7 @@ export const authService = {
     return null;
   },
 
+  // ─── Change Password ───
   changePassword: async (payload: ChangePasswordFormType & { userId: number | undefined }) => {
     const { newPassword, oldPassword, userId } = payload;
 

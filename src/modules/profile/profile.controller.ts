@@ -7,11 +7,20 @@ import { sendSuccess } from '@/utils/response.util';
 import { StatusCodes } from 'http-status-codes';
 
 export const profileController = {
+  // ─── Update Profile ───
   updateProfile: asyncHandler(async (req: Request, res: Response) => {
     const body = req.body as UpdateProfileFormType;
     const loggedInUser = req.user as LoggedInUser;
     const data = await profileService.updateProfile(body, loggedInUser);
 
     sendSuccess(res, data, 'Profile updated successfully', StatusCodes.OK);
+  }),
+
+  // ─── Get Current User Profile ───
+  getProfile: asyncHandler(async (req: Request, res: Response) => {
+    const loggedInUser = req.user as LoggedInUser;
+    const result = await profileService.getProfile(loggedInUser);
+
+    sendSuccess(res, result.data, result.message, StatusCodes.OK);
   }),
 };

@@ -12,4 +12,7 @@ router.use(authMiddleware.verifyAccessToken);
 // ─── Update Profile ───
 router.put('/', validate(profileSchema.updateProfile), profileController.updateProfile);
 
+// ─── Get Current User Profile ───
+router.get('/', profileController.getProfile);
+
 export default router;
