@@ -44,15 +44,13 @@ export const agentController = {
   // ─── Update Agent Finance ───
   updateAgentFinance: asyncHandler(async (req: Request, res: Response) => {
     const agentId = Number(req.params.agentId);
-    const adminId = Number(req.user?.userId);
     const loggedInUser = req.user as JWTAccessTokenType;
 
-    if (isNaN(agentId) || isNaN(adminId)) sendError(res, 'Invalid agent or admin ID', StatusCodes.BAD_REQUEST);
+    if (isNaN(agentId) || isNaN(loggedInUser?.userId)) sendError(res, 'Invalid agent or admin ID', StatusCodes.BAD_REQUEST);
 
     const data = await agentService.updateAgentFinance(
       req.body as UpdateAgentFinanceFormType,
       agentId,
-      adminId,
       loggedInUser,
     );
 

@@ -136,7 +136,10 @@ export const agentService = {
       });
 
       if (updateResult.count === 0) {
-        throw new AppError('Linked user not found for this agent. Status update aborted.', StatusCodes.INTERNAL_SERVER_ERROR);
+        throw new AppError(
+          'Linked user not found for this agent. Status update aborted.',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+        );
       }
 
       if (status === 'REJECTED') {
@@ -190,13 +193,9 @@ export const agentService = {
   },
 
   // ─── Update Agent Finance ───
-  updateAgentFinance: async (
-    payload: UpdateAgentFinanceFormType,
-    agentId: number,
-    superAdminId: number,
-    loggedInUser: LoggedInUser,
-  ) => {
+  updateAgentFinance: async (payload: UpdateAgentFinanceFormType, agentId: number, loggedInUser: LoggedInUser) => {
     const { commission, paymentType, reason } = payload;
+    const { userId } = loggedInUser;
 
     const agent = await agentService.getAgentById(agentId, loggedInUser);
 
@@ -224,7 +223,7 @@ export const agentService = {
             agentId,
             newCommission: commission,
             oldCommission: agent.commission || 0,
-            changedBy: superAdminId,
+            changedBy: userId,
             reason: reason || 'Commission updated by Super Admin',
           },
         });
@@ -236,7 +235,7 @@ export const agentService = {
             agentId,
             newPaymentType: paymentType,
             oldPaymentType: agent.paymentType,
-            changedBy: superAdminId,
+            changedBy: userId,
             reason: reason || 'Payment Type updated by Super Admin',
           },
         });

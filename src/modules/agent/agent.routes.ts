@@ -33,7 +33,7 @@ router.patch(
 // ─── Update Agent Finance ───
 router.patch(
   '/finance/:agentId',
-  authMiddleware.authorize([UserRole.super_admin]),
+  authMiddleware.authorize([UserRole.super_admin, UserRole.psa]),
   validate(agentSchema.updateAgentFinanceSchema),
   agentController.updateAgentFinance,
 );
