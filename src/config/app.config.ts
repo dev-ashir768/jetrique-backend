@@ -11,4 +11,5 @@ export const appConfig = {
   smtpUser: process.env.SMTP_USER!,
   smtpPass: process.env.SMTP_PASS!,
   smtpFrom: process.env.SMTP_FROM!,
+  clientBaseUrl: process.env.CLIENT_BASE_URL!,
 };

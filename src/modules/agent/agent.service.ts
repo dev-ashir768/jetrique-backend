@@ -12,6 +12,7 @@ import {
 } from './agent.schema';
 import { userService } from '../user/user.service';
 import { generatePassword, hashPassword } from '@/utils/password.util';
+import { sendSubAgentCreationGreetings } from '@/utils/mailer.util';
 
 export const agentService = {
   // ─── Get Agents ───
@@ -308,7 +309,10 @@ export const agentService = {
       return { agent, user };
     });
 
+    await sendSubAgentCreationGreetings(email, psaAgent.fullName, fullName, email, tempPassword);
+
     return {
+      message: 'Sub-agent created successfully. Awaiting super admin approval.',
       agentId: result.agent.id,
     };
   },

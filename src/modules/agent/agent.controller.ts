@@ -66,6 +66,6 @@ export const agentController = {
 
     const data = await agentService.createSubAgent(payload, loggedInUser);
 
-    sendSuccess(res, data, 'Sub-agent created successfully. Awaiting super admin approval.', StatusCodes.CREATED);
+    sendSuccess(res, data.agentId, data.message, StatusCodes.CREATED);
   }),
 };

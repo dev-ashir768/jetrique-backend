@@ -14,6 +14,7 @@ import { JWTAccessTokenType, JWTRefreshTokenType, LoggedInUser } from '@/types';
 import { AppError } from '@/middleware/error.middleware';
 import { logger } from '@/config/logger.config';
 import { Prisma } from '@prisma/client';
+import { sendAgentCreationGreetings } from '@/utils/mailer.util';
 
 export const authService = {
   // ─── Register Agent ───
@@ -58,6 +59,8 @@ export const authService = {
       });
       return { agent, user };
     });
+
+    await sendAgentCreationGreetings(email, fullName, role.name);
 
     return {
       agentId: result.agent.id,
