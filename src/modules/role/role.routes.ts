@@ -4,6 +4,13 @@ import { roleController } from './role.controller';
 
 const router = Router();
 
-router.get('/', authMiddleware.verifyAccessToken, roleController.getAllRoles);
+// ─── Get Roles (No Token Required) ───
+router.get('/lookup', roleController.getRoleLookup);
+
+// ─── Authorization Token Verification ───
+router.use(authMiddleware.verifyAccessToken);
+
+// ─── Get all Roles ───
+router.get('/', roleController.getAllRoles);
 
 export default router;

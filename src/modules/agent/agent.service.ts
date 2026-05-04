@@ -2,7 +2,7 @@ import { prisma } from '@/config/db.config';
 import { AppError } from '@/middleware/error.middleware';
 import { StatusCodes } from 'http-status-codes';
 import { AgentStatus, Prisma, UserRole } from '@prisma/client';
-import { getAgentIdFilter } from '@/utils/rbac.util';
+import { getAgentIdsFilter } from '@/utils/rbac.util';
 import { LoggedInUser } from '@/types';
 import {
   CreateSubAgentFormType,
@@ -17,7 +17,7 @@ export const agentService = {
   // ─── Get Agents ───
   getAgents: async (query: GetAgentsFormType, loggedInUser: LoggedInUser) => {
     const { page = '1', limit = '10', search, status } = query;
-    const { agentId: id } = await getAgentIdFilter(loggedInUser);
+    const { agentId: id } = await getAgentIdsFilter(loggedInUser);
     const { agentId: requestingAgentId } = loggedInUser;
 
     const take = parseInt(limit);
@@ -65,7 +65,7 @@ export const agentService = {
 
   // ─── Get Agent by Id ───
   getAgentById: async (agentId: number, loggedInUser: LoggedInUser) => {
-    const { agentId: psaId } = await getAgentIdFilter(loggedInUser);
+    const { agentId: psaId } = await getAgentIdsFilter(loggedInUser);
 
     const agent = await prisma.agent.findUnique({
       where: { id: agentId, deletedAt: null, ...(psaId && { psaId }) },

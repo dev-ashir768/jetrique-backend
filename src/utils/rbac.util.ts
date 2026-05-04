@@ -2,7 +2,7 @@ import { prisma } from '@/config/db.config';
 import { LoggedInUser } from '@/types';
 import { UserRole } from '@prisma/client';
 
-export const getAgentIdFilter = async (loggedInUser: LoggedInUser) => {
+export const getAgentIdsFilter = async (loggedInUser: LoggedInUser) => {
   const { roleSlug, agentId } = loggedInUser;
 
   if (roleSlug === UserRole.super_admin) return {};

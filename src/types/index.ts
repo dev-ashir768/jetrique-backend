@@ -1,4 +1,6 @@
-export interface JWTAccessTokenType {
+import { JwtPayload } from 'jsonwebtoken';
+
+export interface JWTAccessTokenType extends JwtPayload {
   userId: number;
   agentId: number | null;
   roleId: number;
