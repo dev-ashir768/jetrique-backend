@@ -100,6 +100,7 @@ export const agentService = {
 
     const agent = await prisma.agent.findUnique({
       where: { id: agentId, deletedAt: null, isActive: true },
+      include: { psa: { select: { fullName: true } } },
     });
 
     //  Check agent
@@ -118,7 +119,6 @@ export const agentService = {
         where: { id: agentId },
         data: {
           status,
-          // isActive: status === 'APPROVED',
           ...(status === 'APPROVED' && {
             commission,
             paymentType,
@@ -128,13 +128,16 @@ export const agentService = {
         },
       });
 
-      await tx.user.updateMany({
+      const updateResult = await tx.user.updateMany({
         where: { agentId },
         data: {
           status,
-          // isActive: status === 'APPROVED',
         },
       });
+
+      if (updateResult.count === 0) {
+        throw new AppError('Linked user not found for this agent. Status update aborted.', StatusCodes.INTERNAL_SERVER_ERROR);
+      }
 
       if (status === 'REJECTED') {
         await tx.refreshToken.updateMany({
@@ -306,6 +309,7 @@ export const agentService = {
           phone,
           password: hashedPassword,
           roleId: subAgentRole.id,
+          agentId: agent.id,
           status: AgentStatus.PENDING,
         },
       });

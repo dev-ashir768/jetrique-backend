@@ -26,7 +26,7 @@ router.get('/:agentId', authMiddleware.authorize([UserRole.super_admin, UserRole
 router.patch(
   '/status/:agentId',
   authMiddleware.authorize([UserRole.super_admin]),
-  validate(agentSchema.updateAgentStatusSchema, ValidationSource.PARAMS),
+  validate(agentSchema.updateAgentStatusSchema),
   agentController.updateAgentStatus,
 );
 
@@ -34,7 +34,7 @@ router.patch(
 router.patch(
   '/finance/:agentId',
   authMiddleware.authorize([UserRole.super_admin]),
-  validate(agentSchema.updateAgentFinanceSchema, ValidationSource.PARAMS),
+  validate(agentSchema.updateAgentFinanceSchema),
   agentController.updateAgentFinance,
 );
 
