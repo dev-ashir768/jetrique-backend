@@ -40,12 +40,6 @@ export const roleService = {
         isActive: true,
         slug: { in: [UserRole.individual_agent, UserRole.psa] },
       },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-      },
     });
 
     return {
