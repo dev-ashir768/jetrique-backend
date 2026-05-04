@@ -27,24 +27,33 @@ export const SubAgentGreetingsEmail = ({ subAgentName, psaName, email, password 
         <Text className="m-0 text-[#1B4F8A] text-sm font-bold mb-3 uppercase tracking-wider">Login Credentials</Text>
 
         <Text className="m-0 text-sm text-gray-700 mb-2">
-          <strong>Email:</strong> <span className="text-gray-900">{email}</span>
+          <strong>Email:</strong> {email}
         </Text>
 
         <Text className="m-0 text-sm text-gray-700">
-          <strong>Password:</strong> <code className="bg-gray-200 px-1 rounded text-black">{password}</code>
+          <strong>Password:</strong>{' '}
+          <code style={{ backgroundColor: '#e2e8f0', padding: '2px 4px', borderRadius: '4px' }}>{password}</code>
         </Text>
 
         <Hr className="border-gray-200 my-4" />
 
         <Text className="m-0 text-[11px] text-gray-500 italic leading-tight">
-          * For security reasons, please change your password immediately after logging in for the first time.
+          * Security Note: Please change your password immediately after your first login.
         </Text>
       </Section>
 
       {/* ─── Dashboard Link ─── */}
       <Section className="text-center my-6">
         <Button
-          className="bg-[#1B4F8A] text-white px-8 py-3 rounded font-bold text-sm no-underline"
+          style={{
+            backgroundColor: '#1B4F8A',
+            color: '#fff',
+            padding: '12px 24px',
+            borderRadius: '4px',
+            textDecoration: 'none',
+            fontWeight: 'bold',
+            display: 'inline-block',
+          }}
           href={`${process.env.NEXT_PUBLIC_APP_URL}/login`}
         >
           Login to Dashboard
@@ -52,10 +61,10 @@ export const SubAgentGreetingsEmail = ({ subAgentName, psaName, email, password 
       </Section>
 
       <Text className="text-gray-700 text-base">
-        <strong>What's Next?</strong>
+        <strong>Important:</strong>
         <br />
-        Jetrique Admin is currently finalizing your access. You will receive a separate email with your secure login
-        credentials and dashboard link once the verification is complete.
+        Your account access is being finalized. You can use these credentials to access your dashboard as soon as you
+        receive the activation notification from our team.
       </Text>
 
       <Hr className="border-gray-200 my-6" />

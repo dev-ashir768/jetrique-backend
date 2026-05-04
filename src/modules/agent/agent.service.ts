@@ -12,7 +12,7 @@ import {
 } from './agent.schema';
 import { userService } from '../user/user.service';
 import { generatePassword, hashPassword } from '@/utils/password.util';
-import { sendSubAgentCreationGreetings } from '@/utils/mailer.util';
+import { sendAgentStatusUpdate, sendSubAgentCreationGreetings } from '@/utils/mailer.util';
 
 export const agentService = {
   // ─── Get Agents ───
@@ -179,6 +179,8 @@ export const agentService = {
       }
     });
 
+    await sendAgentStatusUpdate(agent.email, agent.fullName, status, commission, paymentType, reason);
+
     return {
       message: `Agent ${status.toLowerCase()} successfully`,
     };
@@ -237,6 +239,8 @@ export const agentService = {
         });
       }
     });
+
+    await sendAgentStatusUpdate(agent.email, agent.fullName, agent.status, commission, paymentType, reason);
 
     return {};
   },
