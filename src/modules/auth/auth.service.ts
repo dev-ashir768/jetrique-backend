@@ -20,6 +20,7 @@ import { sendAgentCreationGreetings, sendResetPassword } from '@/utils/mailer.ut
 import { StatusCodes } from 'http-status-codes';
 import { createHash } from 'node:crypto';
 import { appConfig } from '@/config/app.config';
+import ms, { StringValue } from 'ms';
 
 export const authService = {
   // ─── Register Agent ───
@@ -327,7 +328,7 @@ export const authService = {
     // Generate reset token
     const resetToken = crypto.randomUUID();
     const resetTokenHash = createHash('sha256').update(resetToken).digest('hex');
-    const resetTokenExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 mins
+    const resetTokenExpiry = new Date(Date.now() + ms(appConfig.resetTokenExpiry as StringValue));
 
     await prisma.resetPassword.create({
       data: {

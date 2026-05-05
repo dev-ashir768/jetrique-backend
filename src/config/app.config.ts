@@ -12,4 +12,5 @@ export const appConfig = {
   smtpPass: process.env.SMTP_PASS!,
   smtpFrom: process.env.SMTP_FROM!,
   clientBaseUrl: process.env.CLIENT_BASE_URL!,
+  resetTokenExpiry: process.env.RESET_TOKEN_EXPIRY!,
 };
