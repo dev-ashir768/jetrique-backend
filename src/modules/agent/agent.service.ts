@@ -320,7 +320,7 @@ export const agentService = {
 
     return {
       message: 'Sub-agent created successfully. Awaiting super admin approval.',
-      agentId: result.agent.id,
+      data: { agentId: result.agent.id },
     };
   },
 };

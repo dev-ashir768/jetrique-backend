@@ -1,6 +1,7 @@
 import { prisma } from '@/config/db.config';
 import {
   ChangePasswordFormType,
+  ForgotPasswordFormType,
   LoginFormType,
   LogoutFormType,
   RefreshAccessTokenFormType,
@@ -15,6 +16,7 @@ import { AppError } from '@/middleware/error.middleware';
 import { logger } from '@/config/logger.config';
 import { Prisma } from '@prisma/client';
 import { sendAgentCreationGreetings } from '@/utils/mailer.util';
+import { StatusCodes } from 'http-status-codes';
 
 export const authService = {
   // ─── Register Agent ───
@@ -305,7 +307,18 @@ export const authService = {
 
     return {
       message: 'Password changed successfully. Please login again.',
-      data: null
+      data: null,
     };
+  },
+
+  // ─── Forgot Password ───
+  forgotPassword: async (payload: ForgotPasswordFormType) => {
+    const { email } = payload;
+
+    const user = await prisma.user.findUnique({
+      where: { email, deletedAt: null, isActive: true },
+    });
+
+    if (!user) throw new AppError('If this email exists, a reset link has been sent', StatusCodes.NOT_FOUND);
   },
 };

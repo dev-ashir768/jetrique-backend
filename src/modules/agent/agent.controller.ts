@@ -62,8 +62,8 @@ export const agentController = {
     const payload = req.body as CreateSubAgentFormType;
     const loggedInUser = req.user as JWTAccessTokenType;
 
-    const data = await agentService.createSubAgent(payload, loggedInUser);
+    const result = await agentService.createSubAgent(payload, loggedInUser);
 
-    sendSuccess(res, data.agentId, data.message, StatusCodes.CREATED);
+    sendSuccess(res, result.data, result.message, StatusCodes.CREATED);
   }),
 };
