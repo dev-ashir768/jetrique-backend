@@ -16,7 +16,7 @@ export const PermissionService = {
     const permissionFilter: Prisma.PermissionWhereInput = {
       deletedAt: null,
       isActive: true,
-      parentId: null,
+      // parentId: null,
       ...(status && { type: status }),
       ...(startDate && { createdAt: { gte: startOfDay(startDate) } }),
       ...(endDate && { createdAt: { lte: endOfDay(endDate) } }),
@@ -32,12 +32,12 @@ export const PermissionService = {
         where: whereClause,
         select: {
           permission: {
-            include: {
-              children: {
-                where: { deletedAt: null, isActive: true },
-                orderBy: { createdAt: 'asc' },
-              },
-            },
+            // include: {
+            //   children: {
+            //     where: { deletedAt: null, isActive: true },
+            //     orderBy: { createdAt: 'asc' },
+            //   },
+            // },
           },
         },
         take,

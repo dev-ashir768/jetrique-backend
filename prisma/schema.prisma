@@ -72,9 +72,11 @@ model Permission {
   id          Int            @id @default(autoincrement())
   name        String
   slug        String
+  url         String?
   description String?
   icon        String?        @default("House")
   type        PermissionType @default(MENU)
+
 
   parentId Int?
   parent   Permission?  @relation("PermissionParent", fields: [parentId], references: [id])
