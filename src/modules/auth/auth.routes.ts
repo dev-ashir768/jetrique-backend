@@ -16,6 +16,6 @@ router.use(authMiddleware.verifyAccessToken);
 
 router.get('/me', authController.getMe);
 router.post('/logout', validate(logoutSchema), authController.logout);
-router.put('change-password', validate(changePasswordSchema), authController.changePassword);
+router.put('/change-password', validate(changePasswordSchema), authController.changePassword);
 
 export default router;

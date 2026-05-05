@@ -273,11 +273,15 @@ export const authService = {
   },
 
   // ─── Change Password ───
-  changePassword: async (payload: ChangePasswordFormType & { userId: number | undefined }) => {
-    const { newPassword, oldPassword, userId } = payload;
+  changePassword: async (payload: ChangePasswordFormType, loggedInUser: LoggedInUser) => {
+    const { newPassword, oldPassword } = payload;
+    const { userId } = loggedInUser;
 
     // Find user
-    const user = await userService.getUserById(userId!);
+    const user = await prisma.user.findUnique({
+      where: { id: userId, isActive: true, deletedAt: null },
+      include: { role: true },
+    });
     if (!user) throw new AppError('User not found.', 404);
 
     // Hash new password
@@ -299,6 +303,9 @@ export const authService = {
       data: { isRevoked: true },
     });
 
-    return null;
+    return {
+      message: 'Password changed successfully. Please login again.',
+      data: null
+    };
   },
 };

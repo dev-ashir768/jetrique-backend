@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { authService } from './auth.service';
 import { sendError, sendSuccess } from '@/utils/response.util';
 import { JWTAccessTokenType } from '@/types';
+import { StatusCodes } from 'http-status-codes';
 
 export const authController = {
   registerAgent: asyncHandler(async (req: Request, res: Response) => {
@@ -24,17 +25,19 @@ export const authController = {
   }),
 
   changePassword: asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user?.userId;
     const { newPassword, oldPassword } = req.body;
+    const loggedInUser = req.user as JWTAccessTokenType;
 
-    if (!userId) sendError(res, 'Unauthorized', 404);
+    if (!loggedInUser) sendError(res, 'Unauthorized', 404);
 
-    const data = await authService.changePassword({
-      newPassword,
-      oldPassword,
-      userId,
-    });
-    sendSuccess(res, data, 'Password changed successfully. Please login again.');
+    const result = await authService.changePassword(
+      {
+        newPassword,
+        oldPassword,
+      },
+      loggedInUser,
+    );
+    sendSuccess(res, result.data, result.message, StatusCodes.OK);
   }),
 
   refreshAccessToken: asyncHandler(async (req: Request, res: Response) => {
