@@ -6,6 +6,7 @@ import {
   LogoutFormType,
   RefreshAccessTokenFormType,
   RegisterFormType,
+  ResetPasswordFormType,
 } from './auth.schema';
 import { comparePassword, hashPassword } from '@/utils/password.util';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '@/utils/jwt.util';
@@ -15,8 +16,10 @@ import { JWTAccessTokenType, JWTRefreshTokenType, LoggedInUser } from '@/types';
 import { AppError } from '@/middleware/error.middleware';
 import { logger } from '@/config/logger.config';
 import { Prisma } from '@prisma/client';
-import { sendAgentCreationGreetings } from '@/utils/mailer.util';
+import { sendAgentCreationGreetings, sendResetPassword } from '@/utils/mailer.util';
 import { StatusCodes } from 'http-status-codes';
+import { createHash } from 'node:crypto';
+import { appConfig } from '@/config/app.config';
 
 export const authService = {
   // ─── Register Agent ───
@@ -320,5 +323,57 @@ export const authService = {
     });
 
     if (!user) throw new AppError('If this email exists, a reset link has been sent', StatusCodes.NOT_FOUND);
+
+    // Generate reset token
+    const resetToken = crypto.randomUUID();
+    const resetTokenHash = createHash('sha256').update(resetToken).digest('hex');
+    const resetTokenExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 mins
+
+    await prisma.resetPassword.create({
+      data: {
+        email: user.email,
+        token: resetTokenHash,
+        expiresAt: resetTokenExpiry,
+        userId: user.id,
+      },
+    });
+
+    const resetUrl = `${appConfig.clientBaseUrl}/reset-password?token=${resetToken}`;
+
+    await sendResetPassword(user.email, user.fullName, resetUrl);
+
+    return { message: 'If this email exists, a reset link has been sent', data: null };
+  },
+
+  // ─── Reset Password ───
+  resetPassword: async (payload: ResetPasswordFormType) => {
+    const { token, newPassword } = payload;
+
+    const resetTokenHash = createHash('sha256').update(token).digest('hex');
+
+    const resetToken = await prisma.resetPassword.findUnique({
+      where: { token: resetTokenHash, expiresAt: { gt: new Date() } },
+    });
+
+    if (!resetToken) throw new AppError('Invalid or expired reset token.', StatusCodes.UNAUTHORIZED);
+    const hashedPassword = await hashPassword(newPassword);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: resetToken.userId },
+        data: {
+          password: hashedPassword,
+        },
+      });
+
+      await tx.resetPassword.delete({
+        where: { id: resetToken.id },
+      });
+    });
+
+    return {
+      message: 'Password reset successful. You can now login with your new password.',
+      data: null,
+    };
   },
 };

@@ -75,3 +75,15 @@ export const sendAgentStatusUpdate = async (
     html,
   });
 };
+
+// ─── Reset Password ───
+export const sendResetPassword = async (to: string, fullName: string, resetLink: string) => {
+  const { ResetPasswordEmail } = await import('@/emails/templates/ResetPasswordEmail');
+  const html = await render(ResetPasswordEmail({ fullName, resetLink }));
+
+  await sendMail({
+    to,
+    subject: 'Reset your Jetrique password',
+    html,
+  });
+};

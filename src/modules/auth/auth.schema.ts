@@ -86,7 +86,7 @@ export const forgotPasswordSchema = z.object({
 // ─── Reset Password ───
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token is required'),
-  password: z
+  newPassword: z
     .string()
     .min(8, {
       error: (issue) => (issue.input === '' ? 'Password is required' : 'Password must be at least 8 characters long'),

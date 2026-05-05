@@ -49,4 +49,18 @@ export const authController = {
     const data = await authService.logout(req.body);
     sendSuccess(res, data, 'Logout successful');
   }),
+
+  forgotPassword: asyncHandler(async (req: Request, res: Response) => {
+    const data = req.body;
+    const result = await authService.forgotPassword(data);
+
+    sendSuccess(res, result.data, result.message, StatusCodes.OK);
+  }),
+
+  resetPassword: asyncHandler(async (req: Request, res: Response) => {
+    const data = req.body;
+    const result = await authService.resetPassword(data);
+
+    sendSuccess(res, result.data, result.message, StatusCodes.OK);
+  }),
 };

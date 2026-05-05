@@ -46,13 +46,10 @@ export const agentController = {
     const agentId = Number(req.params.agentId);
     const loggedInUser = req.user as JWTAccessTokenType;
 
-    if (isNaN(agentId) || isNaN(loggedInUser?.userId)) sendError(res, 'Invalid agent or admin ID', StatusCodes.BAD_REQUEST);
+    if (isNaN(agentId) || isNaN(loggedInUser?.userId))
+      sendError(res, 'Invalid agent or admin ID', StatusCodes.BAD_REQUEST);
 
-    const data = await agentService.updateAgentFinance(
-      req.body as UpdateAgentFinanceFormType,
-      agentId,
-      loggedInUser,
-    );
+    const data = await agentService.updateAgentFinance(req.body as UpdateAgentFinanceFormType, agentId, loggedInUser);
 
     sendSuccess(res, data, 'Agent finance updated successfully', StatusCodes.OK);
   }),

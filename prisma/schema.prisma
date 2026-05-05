@@ -135,12 +135,12 @@ model RefreshToken {
 // RESET PASSWORD
 // ─────────────────────────────
 model ResetPassword {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
-  email     String   @unique
+  id    Int    @id @default(autoincrement())
+  token String @unique
+  email String @unique
 
   userId Int
-  user User
+  user   User @relation(fields: [userId], references: [id])
 
   expiresAt DateTime
   createdAt DateTime @default(now())
@@ -184,7 +184,6 @@ model Agent {
   agentStatusLogs AgentStatusLog[]
   commissionLogs  CommissionLogs[]
   paymentTypeLogs PaymentTypeLogs[]
-  // agentAuditLogs  AgentAuditLog[]
 
   @@map("agents")
 }
@@ -216,8 +215,9 @@ model User {
   role   Role @relation(fields: [roleId], references: [id])
 
   agentId       Int?
-  agent         Agent?         @relation(fields: [agentId], references: [id])
+  agent         Agent?          @relation(fields: [agentId], references: [id])
   refreshTokens RefreshToken[]
+  resetPassword ResetPassword[]
 
   @@map("users")
 }
