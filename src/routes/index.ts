@@ -5,25 +5,26 @@ import auditTrailRoutes from '@/modules/audit-trail/audit-trail.routes';
 import permissionRoutes from '@/modules/permission/permission.routes';
 import agentRoutes from '@/modules/agent/agent.routes';
 import profileRoutes from '@/modules/profile/profile.routes';
+import { ROUTES } from '@/utils/constants.util';
 
 const router = Router();
 
 // ─── Auth Routes ───
-router.use('/auth', authRoutes);
+router.use(ROUTES.AUTH, authRoutes);
 
 // ─── Role Routes ───
-router.use('/role', roleRoutes);
+router.use(ROUTES.ROLE, roleRoutes);
 
 // ─── Audit Trail Routes ───
-router.use('/audit-trail', auditTrailRoutes);
+router.use(ROUTES.AUDIT_TRAIL, auditTrailRoutes);
 
 // ─── Permission Routes ───
-router.use('/permissions', permissionRoutes);
+router.use(ROUTES.PERMISSION, permissionRoutes);
 
 // ─── Agent Routes ───
-router.use('/agent', agentRoutes);
+router.use(ROUTES.AGENT, agentRoutes);
 
 // ─── Profile Routes ───
-router.use('/profile', profileRoutes);
+router.use(ROUTES.PROFILE, profileRoutes);
 
 export default router;

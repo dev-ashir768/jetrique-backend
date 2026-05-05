@@ -4,3 +4,12 @@ export const REGEX = {
   PHONE: /^(?:(?:\+|00)92\s?|0)?3[0-9]{2}\s?[0-9]{7}$/,
   CNIC: /^\d{5}-?\d{7}-?\d{1}$/,
 } as const;
+
+export const ROUTES = {
+  AUTH: "/auth",
+  ROLE: "/role",
+  AUDIT_TRAIL: "/audit-trail",
+  PERMISSION: "/permissions",
+  AGENT: "/agent",
+  PROFILE: "/profile",
+} as const;
