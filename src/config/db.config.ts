@@ -13,12 +13,14 @@ const adapter = new PrismaMariaDb({
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
   port: Number(process.env.DATABASE_PORT) || 3306,
-  connectionLimit: 5,
+  connectionLimit: 15,
 });
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 const prisma = new PrismaClient({
   adapter,
-  log: ['query', 'info', 'warn', 'error'],
+  log: isProduction ? ['error'] : ['query', 'info', 'warn', 'error'],
 });
 
 export { prisma };
